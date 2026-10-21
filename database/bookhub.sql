@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS categorias (
     descripcion VARCHAR(255) NOT NULL
 );
 
--- 3. Tabla de Libros (Relacionada con Autores y Categorías)
+-- 3. Tabla de Libros (Relacionada con Autores, Categorías e Imagen de Portada)
 CREATE TABLE IF NOT EXISTS libros (
     id_libro INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(200) NOT NULL,
@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS libros (
     stock INT NOT NULL DEFAULT 0,
     id_autor INT DEFAULT 1,
     id_categoria INT DEFAULT 1,
+    imagen_portada LONGTEXT DEFAULT NULL,
     CONSTRAINT fk_libro_autor FOREIGN KEY (id_autor) REFERENCES autores(id_autor) ON DELETE SET NULL,
     CONSTRAINT fk_libro_categoria FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE SET NULL
 );
@@ -78,14 +79,14 @@ INSERT INTO categorias (id_categoria, nombre, descripcion) VALUES
 (4, 'ODS 09 - Innovación e Infraestructura', 'Obras sobre industria sostenible, innovación tecnológica e infraestructura resiliente (Agenda 2030).')
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
 
-INSERT INTO libros (id_libro, titulo, isbn, anio, descripcion, stock, id_autor, id_categoria) VALUES
-(1, 'Cien años de soledad', '9780307474728', 1967, 'Novela cumbre del realismo mágico escrita por el colombiano Gabriel García Márquez.', 5, 1, 1),
-(2, 'Don Quijote de la Mancha', '9788420412146', 1605, 'Obra clásica universal de la literatura española escrita por Miguel de Cervantes.', 3, 2, 1),
-(3, 'El Principito', '9780156012195', 1943, 'Obra literaria y filosófica de Antoine de Saint-Exupéry sobre la amistad y el sentido de la vida.', 7, 3, 1),
-(4, 'Clean Code: Manual de desarrollo ágil de software', '9780132350884', 2008, 'Principios, patrones y buenas prácticas para escribir código limpio y mantenible.', 4, 4, 2),
-(5, 'La Cuarta Revolución Industrial y la Innovación Sostenible (ODS 09)', '9788499926995', 2020, 'Análisis sobre cómo la transformación digital, la industria 4.0 y la innovación impulsan el Objetivo de Desarrollo Sostenible 9.', 6, 5, 4),
-(6, 'Infraestructura Resiliente e Industrialización Inclusiva - Agenda 2030 (ODS 09)', '9789211219876', 2023, 'Guía académica sobre conectividades digitales universitarias, investigación científica e infraestructura sostenible en América Latina.', 5, 6, 4)
-ON DUPLICATE KEY UPDATE titulo = VALUES(titulo);
+INSERT INTO libros (id_libro, titulo, isbn, anio, descripcion, stock, id_autor, id_categoria, imagen_portada) VALUES
+(1, 'Cien años de soledad', '9780307474728', 1967, 'Novela cumbre del realismo mágico escrita por el colombiano Gabriel García Márquez.', 5, 1, 1, 'img/portadas/libro1.svg'),
+(2, 'Don Quijote de la Mancha', '9788420412146', 1605, 'Obra clásica universal de la literatura española escrita por Miguel de Cervantes.', 3, 2, 1, 'img/portadas/libro2.svg'),
+(3, 'El Principito', '9780156012195', 1943, 'Obra literaria y filosófica de Antoine de Saint-Exupéry sobre la amistad y el sentido de la vida.', 7, 3, 1, 'img/portadas/libro3.svg'),
+(4, 'Clean Code: Manual de desarrollo ágil de software', '9780132350884', 2008, 'Principios, patrones y buenas prácticas para escribir código limpio y mantenible.', 4, 4, 2, 'img/portadas/libro4.svg'),
+(5, 'La Cuarta Revolución Industrial y la Innovación Sostenible (ODS 09)', '9788499926995', 2020, 'Análisis sobre cómo la transformación digital, la industria 4.0 y la innovación impulsan el Objetivo de Desarrollo Sostenible 9.', 6, 5, 4, 'img/portadas/libro5.svg'),
+(6, 'Infraestructura Resiliente e Industrialización Inclusiva - Agenda 2030 (ODS 09)', '9789211219876', 2023, 'Guía académica sobre conectividades digitales universitarias, investigación científica e infraestructura sostenible en América Latina.', 5, 6, 4, 'img/portadas/libro6.svg')
+ON DUPLICATE KEY UPDATE titulo = VALUES(titulo), imagen_portada = COALESCE(imagen_portada, VALUES(imagen_portada));
 
 -- 1 Usuario Administrador y 2 Usuarios Lectores ya creados
 INSERT INTO usuarios (id_usuario, nombre, correo, password, rol, estado) VALUES
