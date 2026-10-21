@@ -1,0 +1,1665 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOKHUB | Biblioteca Universitaria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .hero {
+            padding: 80px 20px;
+        }
+        .hero-catalogo {
+            background: linear-gradient(135deg, #0d6efd, #084298);
+            color: white;
+            padding: 50px 0;
+        }
+        .book-card {
+            transition: transform 0.2s;
+        }
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+        .ods-card, .ods-banner {
+            border-left: 5px solid #fd6925;
+        }
+        .badge-ods {
+            background-color: #fd6925;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ============================================================================
+// CAPA DE DATOS (Idéntica a los DAOs Java / MySQL de BookHub)
+// ============================================================================
+
+const INITIAL_AUTORES = [
+    { idAutor: 1, nombre: "Gabriel García Márquez", nacionalidad: "Colombiana" },
+    { idAutor: 2, nombre: "Miguel de Cervantes", nacionalidad: "Española" },
+    { idAutor: 3, nombre: "Antoine de Saint-Exupéry", nacionalidad: "Francesa" },
+    { idAutor: 4, nombre: "Robert C. Martin", nacionalidad: "Estadounidense" },
+    { idAutor: 5, nombre: "Klaus Schwab", nacionalidad: "Alemana" },
+    { idAutor: 6, nombre: "ONU Hábitat / CEPAL", nacionalidad: "Internacional" }
+];
+
+const INITIAL_CATEGORIAS = [
+    { idCategoria: 1, nombre: "Novela", descripcion: "Obras narrativas de ficción y literatura clásica." },
+    { idCategoria: 2, nombre: "Programación", descripcion: "Libros relacionados con ingeniería y desarrollo de software." },
+    { idCategoria: 3, nombre: "Ciencia", descripcion: "Libros relacionados con ciencias exactas, física e investigación." },
+    { idCategoria: 4, nombre: "ODS 09 - Innovación e Infraestructura", descripcion: "Obras sobre industria sostenible, innovación tecnológica e infraestructura resiliente (Agenda 2030)." }
+];
+
+const INITIAL_LIBROS = [
+    {
+        idLibro: 1,
+        titulo: "Cien años de soledad",
+        isbn: "9780307474728",
+        anio: 1967,
+        descripcion: "Novela cumbre del realismo mágico escrita por el colombiano Gabriel García Márquez.",
+        stock: 5,
+        idAutor: 1,
+        nombreAutor: "Gabriel García Márquez",
+        idCategoria: 1,
+        nombreCategoria: "Novela"
+    },
+    {
+        idLibro: 2,
+        titulo: "Don Quijote de la Mancha",
+        isbn: "9788420412146",
+        anio: 1605,
+        descripcion: "Obra clásica universal de la literatura española escrita por Miguel de Cervantes.",
+        stock: 3,
+        idAutor: 2,
+        nombreAutor: "Miguel de Cervantes",
+        idCategoria: 1,
+        nombreCategoria: "Novela"
+    },
+    {
+        idLibro: 3,
+        titulo: "El Principito",
+        isbn: "9780156012195",
+        anio: 1943,
+        descripcion: "Obra literaria y filosófica de Antoine de Saint-Exupéry sobre la amistad y el sentido de la vida.",
+        stock: 7,
+        idAutor: 3,
+        nombreAutor: "Antoine de Saint-Exupéry",
+        idCategoria: 1,
+        nombreCategoria: "Novela"
+    },
+    {
+        idLibro: 4,
+        titulo: "Clean Code: Manual de desarrollo ágil de software",
+        isbn: "9780132350884",
+        anio: 2008,
+        descripcion: "Principios, patrones y buenas prácticas para escribir código limpio y mantenible.",
+        stock: 4,
+        idAutor: 4,
+        nombreAutor: "Robert C. Martin",
+        idCategoria: 2,
+        nombreCategoria: "Programación"
+    },
+    {
+        idLibro: 5,
+        titulo: "La Cuarta Revolución Industrial y la Innovación Sostenible (ODS 09)",
+        isbn: "9788499926995",
+        anio: 2020,
+        descripcion: "Análisis sobre cómo la transformación digital, la industria 4.0 y la innovación impulsan el Objetivo de Desarrollo Sostenible 9.",
+        stock: 6,
+        idAutor: 5,
+        nombreAutor: "Klaus Schwab",
+        idCategoria: 4,
+        nombreCategoria: "ODS 09 - Innovación e Infraestructura"
+    },
+    {
+        idLibro: 6,
+        titulo: "Infraestructura Resiliente e Industrialización Inclusiva - Agenda 2030 (ODS 09)",
+        isbn: "9789211219876",
+        anio: 2023,
+        descripcion: "Guía académica sobre conectividades digitales universitarias, investigación científica e infraestructura sostenible en América Latina.",
+        stock: 5,
+        idAutor: 6,
+        nombreAutor: "ONU Hábitat / CEPAL",
+        idCategoria: 4,
+        nombreCategoria: "ODS 09 - Innovación e Infraestructura"
+    }
+];
+
+const INITIAL_USUARIOS = [
+    { idUsuario: 1, nombre: "Administrador", correo: "admin@bookhub.com", password: "123456", rol: "ADMIN", estado: "ACTIVO" },
+    { idUsuario: 2, nombre: "Juan Pérez (Lector 1)", correo: "juan@bookhub.com", password: "123456", rol: "USUARIO", estado: "ACTIVO" },
+    { idUsuario: 3, nombre: "María López (Lector 2)", correo: "maria@bookhub.com", password: "123456", rol: "USUARIO", estado: "ACTIVO" }
+];
+
+const INITIAL_PRESTAMOS = [
+    { idPrestamo: 1, idUsuario: 2, idLibro: 1, fechaPrestamo: "23/09/2026", fechaDevolucion: "30/09/2026", estado: "PRESTADO" },
+    { idPrestamo: 2, idUsuario: 3, idLibro: 2, fechaPrestamo: "22/09/2026", fechaDevolucion: "29/09/2026", estado: "DEVUELTO" }
+];
+
+function getStore(key, fallback) {
+    try {
+        const raw = localStorage.getItem("bookhub_" + key);
+        if (!raw) {
+            localStorage.setItem("bookhub_" + key, JSON.stringify(fallback));
+            return JSON.parse(JSON.stringify(fallback));
+        }
+        return JSON.parse(raw);
+    } catch (e) {
+        return JSON.parse(JSON.stringify(fallback));
+    }
+}
+
+function setStore(key, val) {
+    try {
+        localStorage.setItem("bookhub_" + key, JSON.stringify(val));
+    } catch (e) {}
+}
+
+function getSessionUser() {
+    try {
+        const raw = sessionStorage.getItem("bookhub_usuario");
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function setSessionUser(u) {
+    if (u) {
+        sessionStorage.setItem("bookhub_usuario", JSON.stringify(u));
+    } else {
+        sessionStorage.removeItem("bookhub_usuario");
+    }
+}
+
+// Estado de navegación
+let state = {
+    view: "index",
+    params: {},
+    flash: {}
+};
+
+function navigate(view, params = {}, flash = {}) {
+    state.view = view;
+    state.params = params;
+    state.flash = flash;
+    window.scrollTo(0, 0);
+    render();
+}
+
+// ============================================================================
+// VISTAS (Mismo diseño y estructura que los JSPs del proyecto)
+// ============================================================================
+
+function renderIndex() {
+    return `
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('index'); return false;">
+                📚 BOOKHUB
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="navigate('index'); return false;">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="navigate('catalogo'); return false;">Catálogo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#ods09">ODS 09</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="navigate('misPrestamos'); return false;">Mis préstamos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light ms-lg-3 mt-2 mt-lg-0" href="#" onclick="navigate('registro'); return false;">Registrarse</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-lg-2 mt-2 mt-lg-0" href="#" onclick="navigate('login'); return false;">Iniciar sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <span class="badge badge-ods mb-3 px-3 py-2">
+                        ⚙️ Alineado al ODS 09: Industria, Innovación e Infraestructura
+                    </span>
+                    <h1 class="display-4 fw-bold">
+                        Tu biblioteca universitaria,
+                        <span class="text-primary">ahora digital.</span>
+                    </h1>
+                    <p class="lead mt-3">
+                        Consulta libros, revisa su disponibilidad
+                        y gestiona tus préstamos desde un solo lugar.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-primary btn-lg">
+                            Explorar catálogo
+                        </a>
+                        <a href="#" onclick="navigate('registro'); return false;" class="btn btn-outline-primary btn-lg">
+                            Crear cuenta de lector
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-5 text-center">
+                    <div class="display-1">📚</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BÚSQUEDA -->
+    <section class="container mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="mb-3">Buscar un libro</h3>
+                <form onsubmit="event.preventDefault(); navigate('catalogo', { busqueda: this.busqueda.value });">
+                    <div class="input-group">
+                        <input type="text" name="busqueda" class="form-control" placeholder="Título, autor, ISBN o categoría (ej. ODS 09)..." required>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIBROS DESTACADOS -->
+    <section class="container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Libros destacados</h2>
+            <a href="#" onclick="navigate('catalogo'); return false;" class="text-decoration-none">Ver catálogo completo →</a>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card book-card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-success">Disponible</span>
+                            <span class="badge bg-secondary ms-1">Novela</span>
+                        </div>
+                        <h5 class="card-title">Cien años de soledad</h5>
+                        <p class="card-text text-muted">Novela cumbre del realismo mágico escrita por Gabriel García Márquez.</p>
+                        <p class="mb-3 mt-auto"><strong>Autor:</strong> Gabriel García Márquez</p>
+                        <a href="#" onclick="navigate('detalleLibro', { id: 1 }); return false;" class="btn btn-outline-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card book-card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-success">Disponible</span>
+                            <span class="badge bg-secondary ms-1">Novela</span>
+                        </div>
+                        <h5 class="card-title">Don Quijote de la Mancha</h5>
+                        <p class="card-text text-muted">Obra clásica universal de Miguel de Cervantes.</p>
+                        <p class="mb-3 mt-auto"><strong>Autor:</strong> Miguel de Cervantes</p>
+                        <a href="#" onclick="navigate('detalleLibro', { id: 2 }); return false;" class="btn btn-outline-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card book-card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="badge bg-success">Disponible</span>
+                            <span class="badge badge-ods ms-1">ODS 09</span>
+                        </div>
+                        <h5 class="card-title">La Cuarta Revolución Industrial y la Innovación Sostenible (ODS 09)</h5>
+                        <p class="card-text text-muted">Transformación digital, industria 4.0 e innovación tecnológica sostenible.</p>
+                        <p class="mb-3 mt-auto"><strong>Autor:</strong> Klaus Schwab</p>
+                        <a href="#" onclick="navigate('detalleLibro', { id: 5 }); return false;" class="btn btn-outline-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- APARTADO ODS 09 -->
+    <section id="ods09" class="container mb-5">
+        <div class="card ods-card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <div class="row align-items-center g-4">
+                    <div class="col-md-8">
+                        <span class="badge badge-ods mb-2 px-3 py-2">AGENDA 2030 - NACIONES UNIDAS</span>
+                        <h3 class="fw-bold mt-2">🏗️ ODS 09: Industria, Innovación e Infraestructura</h3>
+                        <p class="text-muted mt-3">
+                            <strong>BOOKHUB</strong> impulsa el cumplimiento del <strong>Objetivo de Desarrollo Sostenible 9</strong> dentro del entorno universitario mediante la digitalización de la infraestructura bibliotecaria y la democratización del acceso al conocimiento científico y tecnológico:
+                        </p>
+                        <ul class="text-muted mb-4">
+                            <li class="mb-2"><strong>Infraestructura Digital Resiliente (Meta 9.1):</strong> Modernización de los procesos tradicionales de préstamo físico hacia una plataforma web centralizada, accesible y disponible para toda la comunidad estudiantil.</li>
+                            <li class="mb-2"><strong>Fomento a la Investigación Científica e Innovación (Meta 9.5):</strong> Acceso directo a bibliografía especializada en ingeniería, programación, transformación digital e innovación sostenible.</li>
+                            <li><strong>Acceso Universal a las TIC (Meta 9.c):</strong> Consulta en tiempo real de disponibilidad de ejemplares y gestión ágil desde cualquier dispositivo.</li>
+                        </ul>
+                        <a href="#" onclick="navigate('catalogo', { categoria: 'ODS 09 - Innovación e Infraestructura' }); return false;" class="btn btn-primary">
+                            Explorar colección ODS 09 en el Catálogo →
+                        </a>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="p-4 rounded bg-light border">
+                            <div class="display-2 mb-2">⚙️🔬🌐</div>
+                            <h5 class="fw-bold mb-1">ODS 09</h5>
+                            <p class="small text-muted mb-0">Construir infraestructuras resilientes, promover la industrialización sostenible y fomentar la innovación.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INFORMACIÓN -->
+    <section class="container mb-5">
+        <div class="card shadow-sm">
+            <div class="card-body text-center p-5">
+                <h3>¿Qué puedes hacer en BOOKHUB?</h3>
+                <p class="text-muted mt-3 mb-4">
+                    Consulta nuestro catálogo, revisa la disponibilidad de los libros, regístrate como lector y gestiona tus préstamos.
+                </p>
+                <a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-primary me-2">Ver catálogo</a>
+                <a href="#" onclick="navigate('registro'); return false;" class="btn btn-outline-primary me-2">Registrarse</a>
+                <a href="#" onclick="navigate('login'); return false;" class="btn btn-outline-secondary">Iniciar sesión</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p class="mb-1"><strong>BOOKHUB</strong></p>
+            <p class="mb-1">Sistema Web de Gestión de Biblioteca Universitaria</p>
+            <p class="small text-secondary mb-0">Comprometidos con el ODS 09: Industria, Innovación e Infraestructura</p>
+        </div>
+    </footer>
+    `;
+}
+
+function renderLogin() {
+    const error = state.flash.error || "";
+    const registroExitoso = state.params.registro === "exitoso";
+    const correoIngresado = state.flash.correoIngresado || "";
+
+    return `
+    <div class="container py-4">
+        <div class="row justify-content-center align-items-center" style="min-height: 95vh;">
+            <div class="col-md-5">
+                <div class="card shadow">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">📚 BOOKHUB</h2>
+                            <p class="text-muted mb-0">Iniciar sesión en la biblioteca</p>
+                        </div>
+
+                        ${error ? `<div class="alert alert-danger">${error}</div>` : ""}
+                        ${registroExitoso ? `<div class="alert alert-success">¡Cuenta de lector creada correctamente! Ya puedes iniciar sesión con tu correo y contraseña.</div>` : ""}
+
+                        <form onsubmit="handleLogin(event)">
+                            <div class="mb-3">
+                                <label class="form-label">Correo electrónico</label>
+                                <input type="email" id="correoInput" name="correo" class="form-control" placeholder="correo@bookhub.com" value="${correoIngresado}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Contraseña</label>
+                                <div class="input-group">
+                                    <input type="password" id="passwordInput" name="password" class="form-control" placeholder="Ingrese su contraseña" required>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">👁️</button>
+                                </div>
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+                            </div>
+                        </form>
+
+                        <div class="card bg-light border mt-4">
+                            <div class="card-body p-3">
+                                <p class="small fw-bold text-secondary mb-2 text-center">
+                                    🔑 Usuarios ya creados (clic para autocompletar):
+                                </p>
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger text-start" onclick="completarCredenciales('admin@bookhub.com', '123456')">
+                                        🛡️ <strong>Admin:</strong> admin@bookhub.com <span class="float-end badge bg-danger">123456</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary text-start" onclick="completarCredenciales('juan@bookhub.com', '123456')">
+                                        📖 <strong>Lector 1 (Juan Pérez):</strong> juan@bookhub.com <span class="float-end badge bg-primary">123456</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary text-start" onclick="completarCredenciales('maria@bookhub.com', '123456')">
+                                        📖 <strong>Lector 2 (María López):</strong> maria@bookhub.com <span class="float-end badge bg-primary">123456</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4 pt-2 border-top">
+                            <span class="text-muted d-block mb-2">¿Eres un nuevo lector y no tienes cuenta?</span>
+                            <a href="#" onclick="navigate('registro'); return false;" class="btn btn-outline-success btn-sm w-100">✍️ Crear una cuenta nueva</a>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <a href="#" onclick="navigate('index'); return false;" class="text-decoration-none">← Volver al inicio</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const correo = e.target.correo.value.trim();
+    const password = e.target.password.value.trim();
+    const usuarios = getStore("usuarios", INITIAL_USUARIOS);
+
+    const encontrado = usuarios.find(u => u.correo.toLowerCase() === correo.toLowerCase() && u.password === password);
+    if (!encontrado) {
+        navigate("login", {}, { error: "Correo o contraseña incorrectos. Verifica tus credenciales.", correoIngresado: correo });
+        return;
+    }
+    if (encontrado.estado !== "ACTIVO") {
+        navigate("login", {}, { error: "Tu cuenta se encuentra inactiva. Contacta al administrador.", correoIngresado: correo });
+        return;
+    }
+    setSessionUser(encontrado);
+    if (encontrado.rol === "ADMIN") {
+        navigate("dashboard");
+    } else {
+        navigate("usuario");
+    }
+}
+
+function renderRegistro() {
+    const error = state.flash.error || "";
+    const nombreIngresado = state.flash.nombreIngresado || "";
+    const correoIngresado = state.flash.correoIngresado || "";
+
+    return `
+    <div class="container py-4">
+        <div class="row justify-content-center align-items-center" style="min-height: 95vh;">
+            <div class="col-md-5">
+                <div class="card shadow">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">📚 BOOKHUB</h2>
+                            <p class="text-muted mb-0">Registro de nuevo lector</p>
+                        </div>
+
+                        ${error ? `<div class="alert alert-danger">${error}</div>` : ""}
+
+                        <form onsubmit="handleRegistro(event)">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre completo</label>
+                                <input type="text" name="nombre" class="form-control" placeholder="Ej. Pedro López" value="${nombreIngresado}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Correo electrónico</label>
+                                <input type="email" name="correo" class="form-control" placeholder="Ej. pedro@bookhub.com" value="${correoIngresado}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Contraseña</label>
+                                <input type="password" name="password" class="form-control" placeholder="Mínimo 4 caracteres" minlength="4" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Confirmar contraseña</label>
+                                <input type="password" name="confirmarPassword" class="form-control" placeholder="Repite tu contraseña" minlength="4" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Crear cuenta de lector</button>
+                            </div>
+                        </form>
+
+                        <div class="text-center mt-4 pt-2 border-top">
+                            <span class="text-muted">¿Ya tienes una cuenta?</span>
+                            <a href="#" onclick="navigate('login'); return false;" class="text-decoration-none fw-bold">Iniciar sesión</a>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="#" onclick="navigate('index'); return false;" class="text-decoration-none">← Volver al inicio</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function handleRegistro(e) {
+    e.preventDefault();
+    const nombre = e.target.nombre.value.trim();
+    const correo = e.target.correo.value.trim();
+    const password = e.target.password.value.trim();
+    const confirmarPassword = e.target.confirmarPassword.value.trim();
+
+    if (password.length < 4) {
+        navigate("registro", {}, { error: "La contraseña debe tener al menos 4 caracteres.", nombreIngresado: nombre, correoIngresado: correo });
+        return;
+    }
+    if (password !== confirmarPassword) {
+        navigate("registro", {}, { error: "Las contraseñas ingresadas no coinciden.", nombreIngresado: nombre, correoIngresado: correo });
+        return;
+    }
+
+    const usuarios = getStore("usuarios", INITIAL_USUARIOS);
+    if (usuarios.some(u => u.correo.toLowerCase() === correo.toLowerCase())) {
+        navigate("registro", {}, { error: "El correo electrónico ya está registrado.", nombreIngresado: nombre, correoIngresado: correo });
+        return;
+    }
+
+    const maxId = usuarios.reduce((m, u) => Math.max(m, u.idUsuario), 0);
+    usuarios.push({
+        idUsuario: maxId + 1,
+        nombre,
+        correo,
+        password,
+        rol: "USUARIO",
+        estado: "ACTIVO"
+    });
+    setStore("usuarios", usuarios);
+    navigate("login", { registro: "exitoso" });
+}
+
+function renderCatalogo() {
+    const librosAll = getStore("libros", INITIAL_LIBROS);
+    const categorias = getStore("categorias", INITIAL_CATEGORIAS);
+    const usuarioSesion = getSessionUser();
+
+    const busqueda = (state.params.busqueda || "").trim();
+    const categoriaSeleccionada = (state.params.categoria || "").trim();
+
+    const q = busqueda.toLowerCase();
+    const cat = categoriaSeleccionada.toLowerCase();
+
+    const libros = librosAll.filter(l => {
+        const matchTexto = !q
+            || (l.titulo && l.titulo.toLowerCase().includes(q))
+            || (l.nombreAutor && l.nombreAutor.toLowerCase().includes(q))
+            || (l.nombreCategoria && l.nombreCategoria.toLowerCase().includes(q))
+            || (l.isbn && l.isbn.toLowerCase().includes(q))
+            || (l.descripcion && l.descripcion.toLowerCase().includes(q));
+        const matchCat = !cat || (l.nombreCategoria && l.nombreCategoria.toLowerCase().includes(cat));
+        return matchTexto && matchCat;
+    });
+
+    return `
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('index'); return false;">📚 BOOKHUB</a>
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                <a href="#" onclick="navigate('index'); return false;" class="btn btn-outline-light btn-sm">Inicio</a>
+                ${usuarioSesion ? `
+                    ${usuarioSesion.rol === "ADMIN"
+                        ? `<a href="#" onclick="navigate('dashboard'); return false;" class="btn btn-light btn-sm">Panel Admin</a>`
+                        : `<a href="#" onclick="navigate('usuario'); return false;" class="btn btn-light btn-sm">Mi cuenta (${usuarioSesion.nombre})</a>
+                           <a href="#" onclick="navigate('misPrestamos'); return false;" class="btn btn-outline-light btn-sm">Mis préstamos</a>`
+                    }
+                    <a href="#" onclick="setSessionUser(null); navigate('login'); return false;" class="btn btn-dark btn-sm">Cerrar sesión</a>
+                ` : `
+                    <a href="#" onclick="navigate('registro'); return false;" class="btn btn-outline-light btn-sm">Registrarse</a>
+                    <a href="#" onclick="navigate('login'); return false;" class="btn btn-light btn-sm">Iniciar sesión</a>
+                `}
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-catalogo">
+        <div class="container text-center">
+            <h1 class="fw-bold">Catálogo de libros</h1>
+            <p class="lead mb-0">Encuentra los libros disponibles en BOOKHUB y filtra por autor, categoría u ODS 09</p>
+        </div>
+    </section>
+
+    <div class="container py-5">
+        <div class="card ods-banner shadow-sm mb-4">
+            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <span class="badge badge-ods mb-1">ODS 09 - AGENDA 2030</span>
+                    <h5 class="fw-bold mb-1">🏗️ Colección Especial: Industria, Innovación e Infraestructura</h5>
+                    <p class="text-muted small mb-0">Explora nuestra bibliografía sobre transformación digital, infraestructura resiliente e innovación tecnológica sostenible.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="#" onclick="navigate('catalogo', { categoria: 'ODS 09 - Innovación e Infraestructura' }); return false;" class="btn btn-sm btn-primary">Filtrar libros ODS 09</a>
+                    ${(categoriaSeleccionada || busqueda) ? `<a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-sm btn-outline-secondary">Ver todos</a>` : ""}
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-5">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">🔎 Buscar y filtrar libros</h5>
+                <form onsubmit="event.preventDefault(); navigate('catalogo', { busqueda: this.busqueda.value, categoria: this.categoria.value });" class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label small text-muted mb-1">Búsqueda por título, autor o ISBN</label>
+                        <input type="text" id="buscador" name="busqueda" value="${busqueda}" oninput="filtrarTarjetasEnVivo(this.value)" class="form-control" placeholder="Escribe título, autor o ISBN...">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted mb-1">Categoría</label>
+                        <select name="categoria" class="form-select">
+                            <option value="">Todas las categorías</option>
+                            ${categorias.map(c => `<option value="${c.nombre}" ${c.nombre.toLowerCase() === cat ? "selected" : ""}>${c.nombre}</option>`).join("")}
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary w-100">Aplicar filtro</button>
+                        <a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-outline-secondary">Limpiar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row g-4" id="listaLibros">
+            ${libros.length > 0 ? libros.map(libro => {
+                const esOds = libro.nombreCategoria && libro.nombreCategoria.toUpperCase().includes("ODS 09");
+                return `
+                <div class="col-md-4 libro-item">
+                    <div class="card book-card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge ${esOds ? "badge-ods" : "bg-primary"}">${libro.nombreCategoria || "General"}</span>
+                                <span class="text-muted small">Año: ${libro.anio}</span>
+                            </div>
+                            <h4 class="card-title">${libro.titulo}</h4>
+                            <p class="mb-1"><strong>Autor:</strong> ${libro.nombreAutor || "Autor General"}</p>
+                            <p class="text-muted small mb-2">ISBN: ${libro.isbn}</p>
+                            <p class="card-text text-muted">${libro.descripcion}</p>
+                            <div class="mt-auto pt-3">
+                                ${libro.stock > 0
+                                    ? `<div class="mb-3"><span class="badge bg-success">Disponible (${libro.stock} ejemplares)</span></div>`
+                                    : `<div class="mb-3"><span class="badge bg-danger">No disponible</span></div>`
+                                }
+                                <div class="d-grid gap-2">
+                                    <a href="#" onclick="navigate('detalleLibro', { id: ${libro.idLibro} }); return false;" class="btn btn-primary">Ver detalles</a>
+                                    ${libro.stock > 0
+                                        ? `<a href="#" onclick="solicitarPrestamo(${libro.idLibro}); return false;" class="btn btn-outline-primary btn-sm">Solicitar préstamo</a>`
+                                        : ""
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join("") : `
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        No se encontraron libros con los criterios seleccionados.
+                        <a href="#" onclick="navigate('catalogo'); return false;" class="alert-link ms-2">Ver todo el catálogo</a>
+                    </div>
+                </div>
+            `}
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <p class="mb-1">© 2026 BOOKHUB - Sistema de Gestión de Biblioteca Universitaria</p>
+        <p class="small text-secondary mb-0">ODS 09: Industria, Innovación e Infraestructura</p>
+    </footer>
+    `;
+}
+
+function renderDetalleLibro() {
+    const id = parseInt(state.params.id, 10);
+    const libros = getStore("libros", INITIAL_LIBROS);
+    const libro = libros.find(l => l.idLibro === id);
+    if (!libro) {
+        navigate("catalogo");
+        return "";
+    }
+    const esOds = libro.nombreCategoria && libro.nombreCategoria.toUpperCase().includes("ODS 09");
+    const exito = state.params.exito;
+    const error = state.params.error;
+
+    return `
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('index'); return false;">📚 BOOKHUB</a>
+            <div class="d-flex gap-2">
+                <a href="#" onclick="navigate('misPrestamos'); return false;" class="btn btn-outline-light btn-sm">Mis préstamos</a>
+                <a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-light btn-sm">← Volver al catálogo</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                ${exito === "prestado" ? `
+                    <div class="alert alert-success">
+                        ✅ <strong>¡Préstamo registrado exitosamente!</strong> Tienes 7 días para devolver el ejemplar. Puedes consultarlo en <a href="#" onclick="navigate('misPrestamos'); return false;" class="alert-link">Mis préstamos</a>.
+                    </div>
+                ` : ""}
+                ${error === "yaPrestado" ? `
+                    <div class="alert alert-warning">
+                        ⚠️ Ya tienes un préstamo activo de este libro. Revisa <a href="#" onclick="navigate('misPrestamos'); return false;" class="alert-link">Mis préstamos</a>.
+                    </div>
+                ` : ""}
+                ${error === "sinStock" ? `
+                    <div class="alert alert-danger">
+                        ❌ Lo sentimos, este libro no cuenta con ejemplares disponibles en este momento.
+                    </div>
+                ` : ""}
+
+                <div class="card shadow-sm">
+                    <div class="card-body p-5">
+                        <span class="badge ${esOds ? "badge-ods" : "bg-primary"} mb-3">${libro.nombreCategoria || "General"}</span>
+                        <h1 class="fw-bold mb-4">${libro.titulo}</h1>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Autor</div>
+                            <div class="col-md-8">${libro.nombreAutor || "Autor General"}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Categoría</div>
+                            <div class="col-md-8">${libro.nombreCategoria || "General"}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">ISBN</div>
+                            <div class="col-md-8">${libro.isbn}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Año de publicación</div>
+                            <div class="col-md-8">${libro.anio}</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Descripción</div>
+                            <div class="col-md-8">${libro.descripcion}</div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-4 fw-bold">Disponibilidad</div>
+                            <div class="col-md-8">
+                                ${libro.stock > 0
+                                    ? `<span class="badge bg-success">Disponible</span><span class="ms-2">${libro.stock} ejemplares</span>`
+                                    : `<span class="badge bg-danger">No disponible</span>`
+                                }
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            ${libro.stock > 0
+                                ? `<a href="#" onclick="solicitarPrestamo(${libro.idLibro}); return false;" class="btn btn-primary">Solicitar préstamo</a>`
+                                : `<button class="btn btn-secondary" disabled>Libro no disponible</button>`
+                            }
+                            <a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-outline-secondary">Volver al catálogo</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <p class="mb-0">© 2026 BOOKHUB - Sistema de Gestión de Biblioteca Universitaria</p>
+    </footer>
+    `;
+}
+
+function solicitarPrestamo(idLibro) {
+    const usuario = getSessionUser();
+    if (!usuario) {
+        navigate("login");
+        return;
+    }
+    const libros = getStore("libros", INITIAL_LIBROS);
+    const prestamos = getStore("prestamos", INITIAL_PRESTAMOS);
+    const libro = libros.find(l => l.idLibro === idLibro);
+
+    if (!libro || libro.stock <= 0) {
+        navigate("detalleLibro", { id: idLibro, error: "sinStock" });
+        return;
+    }
+
+    const yaTiene = prestamos.some(p => p.idUsuario === usuario.idUsuario && p.idLibro === idLibro && p.estado === "PRESTADO");
+    if (yaTiene) {
+        navigate("detalleLibro", { id: idLibro, error: "yaPrestado" });
+        return;
+    }
+
+    const hoy = new Date();
+    const dev = new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const fmt = d => String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0") + "/" + d.getFullYear();
+
+    const maxId = prestamos.reduce((m, p) => Math.max(m, p.idPrestamo), 0);
+    prestamos.push({
+        idPrestamo: maxId + 1,
+        idUsuario: usuario.idUsuario,
+        idLibro: idLibro,
+        fechaPrestamo: fmt(hoy),
+        fechaDevolucion: fmt(dev),
+        estado: "PRESTADO"
+    });
+    libro.stock -= 1;
+
+    setStore("prestamos", prestamos);
+    setStore("libros", libros);
+    navigate("detalleLibro", { id: idLibro, exito: "prestado" });
+}
+
+function renderUsuario() {
+    const usuario = getSessionUser();
+    if (!usuario) {
+        navigate("login");
+        return "";
+    }
+    return `
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('usuario'); return false;">📚 BOOKHUB</a>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3">Hola, <strong>${usuario.nombre}</strong></span>
+                <a href="#" onclick="setSessionUser(null); navigate('login'); return false;" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="mb-5">
+            <h1 class="fw-bold">¡Bienvenido, ${usuario.nombre}! 👋</h1>
+            <p class="text-muted">Encuentra libros, consulta su disponibilidad y gestiona tus préstamos.</p>
+        </div>
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="display-5 mb-3">📚</div>
+                        <h3 class="fw-bold">Catálogo</h3>
+                        <p class="text-muted">Explora todos los libros disponibles en la biblioteca.</p>
+                        <a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-primary">Ver catálogo</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="display-5 mb-3">📖</div>
+                        <h3 class="fw-bold">Mis préstamos</h3>
+                        <p class="text-muted">Consulta los libros que tienes prestados y tu historial.</p>
+                        <a href="#" onclick="navigate('misPrestamos'); return false;" class="btn btn-primary">Ver mis préstamos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3">🔎 Buscar un libro</h4>
+                <p class="text-muted">Busca rápidamente por título, autor o categoría.</p>
+                <form onsubmit="event.preventDefault(); navigate('catalogo', { busqueda: this.busqueda.value });">
+                    <div class="input-group">
+                        <input type="text" name="busqueda" class="form-control" placeholder="Título, autor o categoría..." required>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-1"><strong>BOOKHUB</strong></p>
+            <p class="mb-0">Sistema Web de Gestión de Biblioteca Universitaria</p>
+        </div>
+    </footer>
+    `;
+}
+
+function renderMisPrestamos() {
+    const usuario = getSessionUser();
+    if (!usuario) {
+        navigate("login");
+        return "";
+    }
+    const prestamos = getStore("prestamos", INITIAL_PRESTAMOS).filter(p => p.idUsuario === usuario.idUsuario);
+    const libros = getStore("libros", INITIAL_LIBROS);
+
+    return `
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('index'); return false;">📚 BOOKHUB</a>
+            <div>
+                <a href="#" onclick="navigate('usuario'); return false;" class="btn btn-outline-light btn-sm me-2">Mi cuenta</a>
+                <a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-light btn-sm me-2">Catálogo</a>
+                <a href="#" onclick="setSessionUser(null); navigate('login'); return false;" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="mb-4">
+            <h1 class="fw-bold">Mis préstamos</h1>
+            <p class="text-muted">Hola, ${usuario.nombre}. Aquí puedes consultar tus préstamos activos e historial.</p>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                ${prestamos.length === 0 ? `
+                    <div class="text-center py-5">
+                        <h4>No tienes préstamos registrados.</h4>
+                        <p class="text-muted">Puedes explorar el catálogo y solicitar un préstamo.</p>
+                        <a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-primary">Ver catálogo</a>
+                    </div>
+                ` : `
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Libro</th>
+                                    <th>Fecha de préstamo</th>
+                                    <th>Fecha de devolución</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${prestamos.map(p => {
+                                    const lib = libros.find(l => l.idLibro === p.idLibro);
+                                    return `
+                                    <tr>
+                                        <td>${p.idPrestamo}</td>
+                                        <td><strong>${lib ? lib.titulo : ("Libro #" + p.idLibro)}</strong></td>
+                                        <td>${p.fechaPrestamo}</td>
+                                        <td>${p.fechaDevolucion}</td>
+                                        <td>
+                                            <span class="badge ${p.estado === "PRESTADO" ? "bg-primary" : "bg-success"}">${p.estado}</span>
+                                        </td>
+                                    </tr>
+                                    `;
+                                }).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                `}
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p class="mb-0">BOOKHUB - Sistema Web de Gestión de Biblioteca Universitaria</p>
+    </footer>
+    `;
+}
+
+function renderDashboard() {
+    const usuario = getSessionUser();
+    if (!usuario || usuario.rol !== "ADMIN") {
+        navigate("login");
+        return "";
+    }
+    return `
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('dashboard'); return false;">BOOKHUB</a>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3">Hola, ${usuario.nombre}</span>
+                <a href="#" onclick="setSessionUser(null); navigate('login'); return false;" class="btn btn-light btn-sm">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="mb-4">
+            <h1 class="fw-bold">Panel de administración</h1>
+            <p class="text-muted">Gestiona los recursos principales de BOOKHUB.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">📚 Libros</h4>
+                        <p class="card-text">Gestiona el catálogo de libros.</p>
+                        <a href="#" onclick="navigate('libros'); return false;" class="btn btn-primary">Gestionar libros</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">✍️ Autores</h4>
+                        <p class="card-text">Gestiona los autores registrados.</p>
+                        <a href="#" onclick="navigate('autores'); return false;" class="btn btn-primary">Gestionar autores</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">🗂️ Categorías</h4>
+                        <p class="card-text">Gestiona las categorías de libros.</p>
+                        <a href="#" onclick="navigate('categorias'); return false;" class="btn btn-primary">Gestionar categorías</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">👥 Usuarios</h4>
+                        <p class="card-text">Gestiona los usuarios del sistema.</p>
+                        <a href="#" onclick="navigate('usuarios'); return false;" class="btn btn-primary">Gestionar usuarios</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">📖 Préstamos</h4>
+                        <p class="card-text">Gestiona los préstamos y devoluciones.</p>
+                        <a href="#" onclick="navigate('prestamos'); return false;" class="btn btn-primary">Gestionar préstamos</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">🔎 Catálogo</h4>
+                        <p class="card-text">Visualiza el catálogo público.</p>
+                        <a href="#" onclick="navigate('catalogo'); return false;" class="btn btn-outline-primary">Ver catálogo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p class="mb-0">BOOKHUB - Sistema Web de Gestión de Biblioteca Universitaria</p>
+    </footer>
+    `;
+}
+
+function renderLibrosAdmin() {
+    const libros = getStore("libros", INITIAL_LIBROS);
+    const autores = getStore("autores", INITIAL_AUTORES);
+    const categorias = getStore("categorias", INITIAL_CATEGORIAS);
+    const editId = state.params.editId;
+    const libroEditar = editId ? libros.find(l => l.idLibro === editId) : null;
+    const editando = !!libroEditar;
+
+    return `
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('dashboard'); return false;">BOOKHUB</a>
+            <a href="#" onclick="navigate('dashboard'); return false;" class="btn btn-outline-light">Volver al Dashboard</a>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div class="mb-4">
+            <h1>Gestión de Libros</h1>
+            <p class="text-muted">Administra el catálogo de libros de la biblioteca.</p>
+        </div>
+        <div class="card shadow-sm mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">${editando ? "Editar libro" : "Agregar nuevo libro"}</h5>
+            </div>
+            <div class="card-body">
+                <form onsubmit="guardarLibroAdmin(event, ${editando ? libroEditar.idLibro : "null"})">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Título</label>
+                            <input type="text" name="titulo" class="form-control" value="${editando ? libroEditar.titulo : ""}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">ISBN</label>
+                            <input type="text" name="isbn" class="form-control" value="${editando ? libroEditar.isbn : ""}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Autor</label>
+                            <select name="idAutor" class="form-select" required>
+                                ${autores.map(a => `<option value="${a.idAutor}" ${editando && libroEditar.idAutor === a.idAutor ? "selected" : ""}>${a.nombre}</option>`).join("")}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Categoría</label>
+                            <select name="idCategoria" class="form-select" required>
+                                ${categorias.map(c => `<option value="${c.idCategoria}" ${editando && libroEditar.idCategoria === c.idCategoria ? "selected" : ""}>${c.nombre}</option>`).join("")}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Año</label>
+                            <input type="number" name="anio" class="form-control" value="${editando ? libroEditar.anio : ""}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Stock</label>
+                            <input type="number" name="stock" min="0" class="form-control" value="${editando ? libroEditar.stock : ""}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-control" rows="3" required>${editando ? libroEditar.descripcion : ""}</textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">${editando ? "Guardar cambios" : "+ Agregar libro"}</button>
+                    ${editando ? `<a href="#" onclick="navigate('libros'); return false;" class="btn btn-secondary ms-2">Cancelar</a>` : ""}
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0">Libros registrados</h5></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th><th>Título</th><th>Autor</th><th>Categoría</th><th>ISBN</th><th>Año</th><th>Stock</th><th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${libros.map(l => `
+                            <tr>
+                                <td>${l.idLibro}</td>
+                                <td><strong>${l.titulo}</strong></td>
+                                <td>${l.nombreAutor || "Autor General"}</td>
+                                <td><span class="badge bg-secondary">${l.nombreCategoria || "General"}</span></td>
+                                <td>${l.isbn}</td>
+                                <td>${l.anio}</td>
+                                <td>${l.stock > 0 ? `<span class="badge bg-success">${l.stock} disponibles</span>` : `<span class="badge bg-danger">Sin stock</span>`}</td>
+                                <td>
+                                    <a href="#" onclick="navigate('libros', { editId: ${l.idLibro} }); return false;" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="#" onclick="eliminarLibroAdmin(${l.idLibro}); return false;" class="btn btn-sm btn-danger">Eliminar</a>
+                                </td>
+                            </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function guardarLibroAdmin(e, idEditar) {
+    e.preventDefault();
+    const libros = getStore("libros", INITIAL_LIBROS);
+    const autores = getStore("autores", INITIAL_AUTORES);
+    const categorias = getStore("categorias", INITIAL_CATEGORIAS);
+
+    const idAutor = parseInt(e.target.idAutor.value, 10);
+    const idCategoria = parseInt(e.target.idCategoria.value, 10);
+    const autorObj = autores.find(a => a.idAutor === idAutor);
+    const catObj = categorias.find(c => c.idCategoria === idCategoria);
+
+    const datos = {
+        titulo: e.target.titulo.value.trim(),
+        isbn: e.target.isbn.value.trim(),
+        anio: parseInt(e.target.anio.value, 10),
+        stock: parseInt(e.target.stock.value, 10),
+        descripcion: e.target.descripcion.value.trim(),
+        idAutor,
+        nombreAutor: autorObj ? autorObj.nombre : "Autor General",
+        idCategoria,
+        nombreCategoria: catObj ? catObj.nombre : "General"
+    };
+
+    if (idEditar) {
+        const idx = libros.findIndex(l => l.idLibro === idEditar);
+        if (idx !== -1) libros[idx] = { idLibro: idEditar, ...datos };
+    } else {
+        const maxId = libros.reduce((m, l) => Math.max(m, l.idLibro), 0);
+        libros.push({ idLibro: maxId + 1, ...datos });
+    }
+    setStore("libros", libros);
+    navigate("libros");
+}
+
+function eliminarLibroAdmin(id) {
+    if (!confirm("¿Deseas eliminar este libro?")) return;
+    const libros = getStore("libros", INITIAL_LIBROS).filter(l => l.idLibro !== id);
+    setStore("libros", libros);
+    navigate("libros");
+}
+
+function renderAutoresAdmin() {
+    const autores = getStore("autores", INITIAL_AUTORES);
+    const editId = state.params.editId;
+    const autorEditar = editId ? autores.find(a => a.idAutor === editId) : null;
+    const editando = !!autorEditar;
+
+    return `
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('dashboard'); return false;">BOOKHUB</a>
+            <a href="#" onclick="navigate('dashboard'); return false;" class="btn btn-outline-light">Volver al Dashboard</a>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div class="mb-4"><h1>Gestión de Autores</h1><p class="text-muted">Administra los autores registrados en la biblioteca.</p></div>
+        <div class="card shadow-sm mb-5">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">${editando ? "Editar autor" : "Agregar nuevo autor"}</h5></div>
+            <div class="card-body">
+                <form onsubmit="guardarAutorAdmin(event, ${editando ? autorEditar.idAutor : "null"})">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre completo</label>
+                            <input type="text" name="nombre" class="form-control" value="${editando ? autorEditar.nombre : ""}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nacionalidad</label>
+                            <input type="text" name="nacionalidad" class="form-control" value="${editando ? autorEditar.nacionalidad : ""}" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">${editando ? "Guardar cambios" : "+ Agregar autor"}</button>
+                    ${editando ? `<a href="#" onclick="navigate('autores'); return false;" class="btn btn-secondary ms-2">Cancelar</a>` : ""}
+                </form>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0">Autores registrados</h5></div>
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark"><tr><th>ID</th><th>Nombre</th><th>Nacionalidad</th><th>Acciones</th></tr></thead>
+                    <tbody>
+                        ${autores.map(a => `
+                        <tr>
+                            <td>${a.idAutor}</td>
+                            <td><strong>${a.nombre}</strong></td>
+                            <td>${a.nacionalidad}</td>
+                            <td>
+                                <a href="#" onclick="navigate('autores', { editId: ${a.idAutor} }); return false;" class="btn btn-sm btn-warning">Editar</a>
+                                <a href="#" onclick="eliminarAutorAdmin(${a.idAutor}); return false;" class="btn btn-sm btn-danger">Eliminar</a>
+                            </td>
+                        </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function guardarAutorAdmin(e, idEditar) {
+    e.preventDefault();
+    const autores = getStore("autores", INITIAL_AUTORES);
+    const nombre = e.target.nombre.value.trim();
+    const nacionalidad = e.target.nacionalidad.value.trim();
+    if (idEditar) {
+        const idx = autores.findIndex(a => a.idAutor === idEditar);
+        if (idx !== -1) autores[idx] = { idAutor: idEditar, nombre, nacionalidad };
+    } else {
+        const maxId = autores.reduce((m, a) => Math.max(m, a.idAutor), 0);
+        autores.push({ idAutor: maxId + 1, nombre, nacionalidad });
+    }
+    setStore("autores", autores);
+    navigate("autores");
+}
+
+function eliminarAutorAdmin(id) {
+    if (!confirm("¿Deseas eliminar este autor?")) return;
+    setStore("autores", getStore("autores", INITIAL_AUTORES).filter(a => a.idAutor !== id));
+    navigate("autores");
+}
+
+function renderCategoriasAdmin() {
+    const categorias = getStore("categorias", INITIAL_CATEGORIAS);
+    const editId = state.params.editId;
+    const catEditar = editId ? categorias.find(c => c.idCategoria === editId) : null;
+    const editando = !!catEditar;
+
+    return `
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('dashboard'); return false;">BOOKHUB</a>
+            <a href="#" onclick="navigate('dashboard'); return false;" class="btn btn-outline-light">Volver al Dashboard</a>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div class="mb-4"><h1>Gestión de Categorías</h1><p class="text-muted">Administra las categorías de los libros.</p></div>
+        <div class="card shadow-sm mb-5">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">${editando ? "Editar categoría" : "Agregar nueva categoría"}</h5></div>
+            <div class="card-body">
+                <form onsubmit="guardarCategoriaAdmin(event, ${editando ? catEditar.idCategoria : "null"})">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" name="nombre" class="form-control" value="${editando ? catEditar.nombre : ""}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-control" rows="3" required>${editando ? catEditar.descripcion : ""}</textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">${editando ? "Guardar cambios" : "+ Agregar categoría"}</button>
+                    ${editando ? `<a href="#" onclick="navigate('categorias'); return false;" class="btn btn-secondary ms-2">Cancelar</a>` : ""}
+                </form>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0">Categorías registradas</h5></div>
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark"><tr><th>ID</th><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr></thead>
+                    <tbody>
+                        ${categorias.map(c => `
+                        <tr>
+                            <td>${c.idCategoria}</td>
+                            <td><strong>${c.nombre}</strong></td>
+                            <td>${c.descripcion}</td>
+                            <td>
+                                <a href="#" onclick="navigate('categorias', { editId: ${c.idCategoria} }); return false;" class="btn btn-sm btn-warning">Editar</a>
+                                <a href="#" onclick="eliminarCategoriaAdmin(${c.idCategoria}); return false;" class="btn btn-sm btn-danger">Eliminar</a>
+                            </td>
+                        </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function guardarCategoriaAdmin(e, idEditar) {
+    e.preventDefault();
+    const categorias = getStore("categorias", INITIAL_CATEGORIAS);
+    const nombre = e.target.nombre.value.trim();
+    const descripcion = e.target.descripcion.value.trim();
+    if (idEditar) {
+        const idx = categorias.findIndex(c => c.idCategoria === idEditar);
+        if (idx !== -1) categorias[idx] = { idCategoria: idEditar, nombre, descripcion };
+    } else {
+        const maxId = categorias.reduce((m, c) => Math.max(m, c.idCategoria), 0);
+        categorias.push({ idCategoria: maxId + 1, nombre, descripcion });
+    }
+    setStore("categorias", categorias);
+    navigate("categorias");
+}
+
+function eliminarCategoriaAdmin(id) {
+    if (!confirm("¿Deseas eliminar esta categoría?")) return;
+    setStore("categorias", getStore("categorias", INITIAL_CATEGORIAS).filter(c => c.idCategoria !== id));
+    navigate("categorias");
+}
+
+function renderUsuariosAdmin() {
+    const usuarios = getStore("usuarios", INITIAL_USUARIOS);
+    const editId = state.params.editId;
+    const uEditar = editId ? usuarios.find(u => u.idUsuario === editId) : null;
+    const editando = !!uEditar;
+
+    return `
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('dashboard'); return false;">BOOKHUB</a>
+            <a href="#" onclick="navigate('dashboard'); return false;" class="btn btn-outline-light">Volver al Dashboard</a>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div class="mb-4"><h1>Gestión de Usuarios</h1><p class="text-muted">Administra los usuarios registrados en BOOKHUB.</p></div>
+        <div class="card shadow-sm mb-5">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">${editando ? "Editar usuario" : "Agregar nuevo usuario"}</h5></div>
+            <div class="card-body">
+                <form onsubmit="guardarUsuarioAdmin(event, ${editando ? uEditar.idUsuario : "null"})">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre completo</label>
+                            <input type="text" name="nombre" class="form-control" value="${editando ? uEditar.nombre : ""}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Correo electrónico</label>
+                            <input type="email" name="correo" class="form-control" value="${editando ? uEditar.correo : ""}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" name="password" class="form-control" value="${editando ? uEditar.password : ""}" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Rol</label>
+                            <select name="rol" class="form-select" required>
+                                <option value="ADMIN" ${editando && uEditar.rol === "ADMIN" ? "selected" : ""}>ADMIN</option>
+                                <option value="USUARIO" ${editando && uEditar.rol === "USUARIO" ? "selected" : ""}>USUARIO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Estado</label>
+                            <select name="estado" class="form-select" required>
+                                <option value="ACTIVO" ${editando && uEditar.estado === "ACTIVO" ? "selected" : ""}>ACTIVO</option>
+                                <option value="INACTIVO" ${editando && uEditar.estado === "INACTIVO" ? "selected" : ""}>INACTIVO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">${editando ? "Guardar cambios" : "+ Agregar usuario"}</button>
+                    ${editando ? `<a href="#" onclick="navigate('usuarios'); return false;" class="btn btn-secondary ms-2">Cancelar</a>` : ""}
+                </form>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-header"><h5 class="mb-0">Usuarios registrados</h5></div>
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark"><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+                    <tbody>
+                        ${usuarios.map(u => `
+                        <tr>
+                            <td>${u.idUsuario}</td>
+                            <td><strong>${u.nombre}</strong></td>
+                            <td>${u.correo}</td>
+                            <td><span class="badge ${u.rol === "ADMIN" ? "bg-danger" : "bg-primary"}">${u.rol}</span></td>
+                            <td><span class="badge ${u.estado === "ACTIVO" ? "bg-success" : "bg-secondary"}">${u.estado}</span></td>
+                            <td>
+                                <a href="#" onclick="navigate('usuarios', { editId: ${u.idUsuario} }); return false;" class="btn btn-sm btn-warning">Editar</a>
+                                <a href="#" onclick="eliminarUsuarioAdmin(${u.idUsuario}); return false;" class="btn btn-sm btn-danger">Eliminar</a>
+                            </td>
+                        </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function guardarUsuarioAdmin(e, idEditar) {
+    e.preventDefault();
+    const usuarios = getStore("usuarios", INITIAL_USUARIOS);
+    const datos = {
+        nombre: e.target.nombre.value.trim(),
+        correo: e.target.correo.value.trim(),
+        password: e.target.password.value.trim(),
+        rol: e.target.rol.value,
+        estado: e.target.estado.value
+    };
+    if (idEditar) {
+        const idx = usuarios.findIndex(u => u.idUsuario === idEditar);
+        if (idx !== -1) usuarios[idx] = { idUsuario: idEditar, ...datos };
+    } else {
+        const maxId = usuarios.reduce((m, u) => Math.max(m, u.idUsuario), 0);
+        usuarios.push({ idUsuario: maxId + 1, ...datos });
+    }
+    setStore("usuarios", usuarios);
+    navigate("usuarios");
+}
+
+function eliminarUsuarioAdmin(id) {
+    if (!confirm("¿Deseas eliminar este usuario?")) return;
+    setStore("usuarios", getStore("usuarios", INITIAL_USUARIOS).filter(u => u.idUsuario !== id));
+    navigate("usuarios");
+}
+
+function renderPrestamosAdmin() {
+    const prestamos = getStore("prestamos", INITIAL_PRESTAMOS);
+    const usuarios = getStore("usuarios", INITIAL_USUARIOS);
+    const libros = getStore("libros", INITIAL_LIBROS);
+    const editId = state.params.editId;
+    const pEditar = editId ? prestamos.find(p => p.idPrestamo === editId) : null;
+    const editar = !!pEditar;
+
+    return `
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="navigate('dashboard'); return false;">BOOKHUB</a>
+            <a href="#" onclick="navigate('dashboard'); return false;" class="btn btn-light btn-sm">Volver al dashboard</a>
+        </div>
+    </nav>
+    <div class="container py-5">
+        <div class="mb-4"><h2 class="fw-bold">Gestión de préstamos</h2><p class="text-muted">Administra los préstamos y devoluciones de libros.</p></div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">${editar ? "Editar préstamo" : "Registrar préstamo"}</h5>
+                <form onsubmit="guardarPrestamoAdmin(event, ${editar ? pEditar.idPrestamo : "null"})">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Usuario / Lector</label>
+                            <select class="form-select" name="idUsuario" required>
+                                ${usuarios.map(u => `<option value="${u.idUsuario}" ${editar && pEditar.idUsuario === u.idUsuario ? "selected" : ""}>#${u.idUsuario} - ${u.nombre} (${u.correo})</option>`).join("")}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Libro</label>
+                            <select class="form-select" name="idLibro" required>
+                                ${libros.map(l => `<option value="${l.idLibro}" ${editar && pEditar.idLibro === l.idLibro ? "selected" : ""}>#${l.idLibro} - ${l.titulo} (Stock: ${l.stock})</option>`).join("")}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha de préstamo</label>
+                            <input type="text" class="form-control" name="fechaPrestamo" placeholder="DD/MM/AAAA" value="${editar ? pEditar.fechaPrestamo : ""}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha de devolución</label>
+                            <input type="text" class="form-control" name="fechaDevolucion" placeholder="DD/MM/AAAA" value="${editar ? pEditar.fechaDevolucion : ""}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select" name="estado" required>
+                                <option value="PRESTADO" ${editar && pEditar.estado === "PRESTADO" ? "selected" : ""}>PRESTADO</option>
+                                <option value="DEVUELTO" ${editar && pEditar.estado === "DEVUELTO" ? "selected" : ""}>DEVUELTO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">${editar ? "Guardar cambios" : "Registrar préstamo"}</button>
+                        ${editar ? `<a href="#" onclick="navigate('prestamos'); return false;" class="btn btn-secondary ms-2">Cancelar</a>` : ""}
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Lista de préstamos</h5>
+                <table class="table table-hover align-middle">
+                    <thead class="table-primary"><tr><th>ID</th><th>Usuario</th><th>Libro</th><th>Fecha préstamo</th><th>Fecha devolución</th><th>Estado</th><th>Acciones</th></tr></thead>
+                    <tbody>
+                        ${prestamos.map(p => {
+                            const u = usuarios.find(x => x.idUsuario === p.idUsuario);
+                            const l = libros.find(x => x.idLibro === p.idLibro);
+                            return `
+                            <tr>
+                                <td>${p.idPrestamo}</td>
+                                <td>${u ? u.nombre : ("Usuario #" + p.idUsuario)}</td>
+                                <td>${l ? l.titulo : ("Libro #" + p.idLibro)}</td>
+                                <td>${p.fechaPrestamo}</td>
+                                <td>${p.fechaDevolucion}</td>
+                                <td><span class="badge ${p.estado === "PRESTADO" ? "bg-warning text-dark" : "bg-success"}">${p.estado}</span></td>
+                                <td>
+                                    <a href="#" onclick="navigate('prestamos', { editId: ${p.idPrestamo} }); return false;" class="btn btn-sm btn-outline-primary">Editar</a>
+                                    <a href="#" onclick="eliminarPrestamoAdmin(${p.idPrestamo}); return false;" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                </td>
+                            </tr>
+                            `;
+                        }).join("")}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function guardarPrestamoAdmin(e, idEditar) {
+    e.preventDefault();
+    const prestamos = getStore("prestamos", INITIAL_PRESTAMOS);
+    const libros = getStore("libros", INITIAL_LIBROS);
+    const idUsuario = parseInt(e.target.idUsuario.value, 10);
+    const idLibro = parseInt(e.target.idLibro.value, 10);
+    const fechaPrestamo = e.target.fechaPrestamo.value.trim();
+    const fechaDevolucion = e.target.fechaDevolucion.value.trim();
+    const estado = e.target.estado.value;
+
+    const libro = libros.find(l => l.idLibro === idLibro);
+
+    if (idEditar) {
+        const idx = prestamos.findIndex(p => p.idPrestamo === idEditar);
+        if (idx !== -1) {
+            const anterior = prestamos[idx];
+            if (libro) {
+                if (anterior.estado === "PRESTADO" && estado === "DEVUELTO") libro.stock += 1;
+                if (anterior.estado === "DEVUELTO" && estado === "PRESTADO" && libro.stock > 0) libro.stock -= 1;
+            }
+            prestamos[idx] = { idPrestamo: idEditar, idUsuario, idLibro, fechaPrestamo, fechaDevolucion, estado };
+        }
+    } else {
+        const maxId = prestamos.reduce((m, p) => Math.max(m, p.idPrestamo), 0);
+        prestamos.push({ idPrestamo: maxId + 1, idUsuario, idLibro, fechaPrestamo, fechaDevolucion, estado });
+        if (estado === "PRESTADO" && libro && libro.stock > 0) libro.stock -= 1;
+    }
+    setStore("prestamos", prestamos);
+    setStore("libros", libros);
+    navigate("prestamos");
+}
+
+function eliminarPrestamoAdmin(id) {
+    if (!confirm("¿Eliminar este préstamo?")) return;
+    setStore("prestamos", getStore("prestamos", INITIAL_PRESTAMOS).filter(p => p.idPrestamo !== id));
+    navigate("prestamos");
+}
+
+// ============================================================================
+// UTILIDADES INTERACTIVAS Y RENDER PRINCIPAL
+// ============================================================================
+
+function completarCredenciales(correo, password) {
+    const c = document.getElementById("correoInput");
+    const p = document.getElementById("passwordInput");
+    if (c) c.value = correo;
+    if (p) p.value = password;
+}
+
+function togglePassword() {
+    const p = document.getElementById("passwordInput");
+    if (p) p.type = (p.type === "password") ? "text" : "password";
+}
+
+function filtrarTarjetasEnVivo(texto) {
+    const q = (texto || "").toLowerCase();
+    document.querySelectorAll(".libro-item").forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? "block" : "none";
+    });
+}
+
+function render() {
+    const app = document.getElementById("app");
+    switch (state.view) {
+        case "login": app.innerHTML = renderLogin(); break;
+        case "registro": app.innerHTML = renderRegistro(); break;
+        case "catalogo": app.innerHTML = renderCatalogo(); break;
+        case "detalleLibro": app.innerHTML = renderDetalleLibro(); break;
+        case "usuario": app.innerHTML = renderUsuario(); break;
+        case "misPrestamos": app.innerHTML = renderMisPrestamos(); break;
+        case "dashboard": app.innerHTML = renderDashboard(); break;
+        case "libros": app.innerHTML = renderLibrosAdmin(); break;
+        case "autores": app.innerHTML = renderAutoresAdmin(); break;
+        case "categorias": app.innerHTML = renderCategoriasAdmin(); break;
+        case "usuarios": app.innerHTML = renderUsuariosAdmin(); break;
+        case "prestamos": app.innerHTML = renderPrestamosAdmin(); break;
+        default: app.innerHTML = renderIndex(); break;
+    }
+}
+
+render();
+</script>
+</body>
+</html>
+
