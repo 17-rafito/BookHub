@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>BOOKHUB | Biblioteca Universitaria</title>
+
+        <!-- Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
+              rel="stylesheet">
+
+        <style>
+            body {
+                background-color: #f5f7fa;
+            }
+
+            .hero {
+                padding: 80px 20px;
+            }
+
+            .book-card {
+                transition: transform 0.2s;
+            }
+
+            .book-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .ods-card {
+                border-left: 5px solid #fd6925;
+            }
+
+            .badge-ods {
+                background-color: #fd6925;
+                color: #ffffff;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+            <div class="container">
+
+                <a class="navbar-brand fw-bold" href="index.html">
+                    📚 BOOKHUB
+                </a>
+
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="index.html">
+                                Inicio
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="CatalogoServlet">
+                                Catálogo
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#ods09">
+                                ODS 09
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="MisPrestamosServlet">
+                                Mis préstamos
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light ms-lg-3 mt-2 mt-lg-0" href="registro.jsp">
+                                Registrarse
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="btn btn-primary ms-lg-2 mt-2 mt-lg-0" href="login.jsp">
+                                Iniciar sesión
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
+
+
+        <!-- HERO -->
+        <section class="hero">
+            <div class="container">
+
+                <div class="row align-items-center">
+
+                    <div class="col-md-7">
+
+                        <span class="badge badge-ods mb-3 px-3 py-2">
+                            ⚙️ Alineado al ODS 09: Industria, Innovación e Infraestructura
+                        </span>
+
+                        <h1 class="display-4 fw-bold">
+                            Tu biblioteca universitaria,
+                            <span class="text-primary">ahora digital.</span>
+                        </h1>
+
+                        <p class="lead mt-3">
+                            Consulta libros, revisa su disponibilidad
+                            y gestiona tus préstamos desde un solo lugar.
+                        </p>
+
+                        <div class="d-flex flex-wrap gap-2 mt-4">
+                            <a href="CatalogoServlet"
+                               class="btn btn-primary btn-lg">
+                                Explorar catálogo
+                            </a>
+
+                            <a href="registro.jsp"
+                               class="btn btn-outline-primary btn-lg">
+                                Crear cuenta de lector
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-5 text-center">
+
+                        <div class="display-1">
+                            📚
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- BÚSQUEDA -->
+        <section class="container mb-5">
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h3 class="mb-3">
+                        Buscar un libro
+                    </h3>
+
+                    <form action="CatalogoServlet" method="get">
+
+                        <div class="input-group">
+
+                            <input type="text"
+                                   name="busqueda"
+                                   class="form-control"
+                                   placeholder="Título, autor, ISBN o categoría (ej. ODS 09)..."
+                                   required>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Buscar
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- LIBROS DESTACADOS -->
+        <section class="container mb-5">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <h2>Libros destacados</h2>
+
+                <a href="CatalogoServlet"
+                   class="text-decoration-none">
+                    Ver catálogo completo →
+                </a>
+
+            </div>
+
+
+            <div class="row g-4">
+
+                <!-- LIBRO 1 -->
+                <div class="col-md-4">
+
+                    <div class="card book-card shadow-sm h-100">
+
+                        <div class="card-body d-flex flex-column">
+
+                            <div class="mb-2">
+                                <span class="badge bg-success">
+                                    Disponible
+                                </span>
+                                <span class="badge bg-secondary ms-1">
+                                    Novela
+                                </span>
+                            </div>
+
+                            <h5 class="card-title">
+                                Cien años de soledad
+                            </h5>
+
+                            <p class="card-text text-muted">
+                                Novela cumbre del realismo mágico escrita por Gabriel García Márquez.
+                            </p>
+
+                            <p class="mb-3 mt-auto">
+                                <strong>Autor:</strong>
+                                Gabriel García Márquez
+                            </p>
+
+                            <a href="DetalleLibroServlet?id=1"
+                               class="btn btn-outline-primary">
+                                Ver detalles
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LIBRO 2 -->
+                <div class="col-md-4">
+
+                    <div class="card book-card shadow-sm h-100">
+
+                        <div class="card-body d-flex flex-column">
+
+                            <div class="mb-2">
+                                <span class="badge bg-success">
+                                    Disponible
+                                </span>
+                                <span class="badge bg-secondary ms-1">
+                                    Novela
+                                </span>
+                            </div>
+
+                            <h5 class="card-title">
+                                Don Quijote de la Mancha
+                            </h5>
+
+                            <p class="card-text text-muted">
+                                Obra clásica universal de Miguel de Cervantes.
+                            </p>
+
+                            <p class="mb-3 mt-auto">
+                                <strong>Autor:</strong>
+                                Miguel de Cervantes
+                            </p>
+
+                            <a href="DetalleLibroServlet?id=2"
+                               class="btn btn-outline-primary">
+                                Ver detalles
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LIBRO 3 (ODS 09) -->
+                <div class="col-md-4">
+
+                    <div class="card book-card shadow-sm h-100">
+
+                        <div class="card-body d-flex flex-column">
+
+                            <div class="mb-2">
+                                <span class="badge bg-success">
+                                    Disponible
+                                </span>
+                                <span class="badge badge-ods ms-1">
+                                    ODS 09
+                                </span>
+                            </div>
+
+                            <h5 class="card-title">
+                                La Cuarta Revolución Industrial y la Innovación Sostenible (ODS 09)
+                            </h5>
+
+                            <p class="card-text text-muted">
+                                Transformación digital, industria 4.0 e innovación tecnológica sostenible.
+                            </p>
+
+                            <p class="mb-3 mt-auto">
+                                <strong>Autor:</strong>
+                                Klaus Schwab
+                            </p>
+
+                            <a href="DetalleLibroServlet?id=5"
+                               class="btn btn-outline-primary">
+                                Ver detalles
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- APARTADO ODS 09 -->
+        <section id="ods09" class="container mb-5">
+
+            <div class="card ods-card shadow-sm">
+
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="row align-items-center g-4">
+
+                        <div class="col-md-8">
+
+                            <span class="badge badge-ods mb-2 px-3 py-2">
+                                AGENDA 2030 - NACIONES UNIDAS
+                            </span>
+
+                            <h3 class="fw-bold mt-2">
+                                🏗️ ODS 09: Industria, Innovación e Infraestructura
+                            </h3>
+
+                            <p class="text-muted mt-3">
+                                <strong>BOOKHUB</strong> impulsa el cumplimiento del <strong>Objetivo de Desarrollo Sostenible 9</strong> dentro del entorno universitario mediante la digitalización de la infraestructura bibliotecaria y la democratización del acceso al conocimiento científico y tecnológico:
+                            </p>
+
+                            <ul class="text-muted mb-4">
+                                <li class="mb-2">
+                                    <strong>Infraestructura Digital Resiliente (Meta 9.1):</strong> Modernización de los procesos tradicionales de préstamo físico hacia una plataforma web centralizada, accesible y disponible para toda la comunidad estudiantil.
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Fomento a la Investigación Científica e Innovación (Meta 9.5):</strong> Acceso directo a bibliografía especializada en ingeniería, programación, transformación digital e innovación sostenible.
+                                </li>
+                                <li>
+                                    <strong>Acceso Universal a las TIC (Meta 9.c):</strong> Consulta en tiempo real de disponibilidad de ejemplares y gestión ágil desde cualquier dispositivo.
+                                </li>
+                            </ul>
+
+                            <a href="CatalogoServlet?categoria=ODS+09+-+Innovaci%C3%B3n+e+Infraestructura"
+                               class="btn btn-primary">
+                                Explorar colección ODS 09 en el Catálogo →
+                            </a>
+
+                        </div>
+
+                        <div class="col-md-4 text-center">
+
+                            <div class="p-4 rounded bg-light border">
+                                <div class="display-2 mb-2">⚙️🔬🌐</div>
+                                <h5 class="fw-bold mb-1">ODS 09</h5>
+                                <p class="small text-muted mb-0">
+                                    Construir infraestructuras resilientes, promover la industrialización sostenible y fomentar la innovación.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- INFORMACIÓN -->
+        <section class="container mb-5">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body text-center p-5">
+
+                    <h3>
+                        ¿Qué puedes hacer en BOOKHUB?
+                    </h3>
+
+                    <p class="text-muted mt-3 mb-4">
+                        Consulta nuestro catálogo, revisa la disponibilidad
+                        de los libros, regístrate como lector y gestiona tus préstamos.
+                    </p>
+
+                    <a href="CatalogoServlet"
+                       class="btn btn-primary me-2">
+                        Ver catálogo
+                    </a>
+
+                    <a href="registro.jsp"
+                       class="btn btn-outline-primary me-2">
+                        Registrarse
+                    </a>
+
+                    <a href="login.jsp"
+                       class="btn btn-outline-secondary">
+                        Iniciar sesión
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- FOOTER -->
+        <footer class="bg-dark text-white py-4">
+
+            <div class="container text-center">
+
+                <p class="mb-1">
+                    <strong>BOOKHUB</strong>
+                </p>
+
+                <p class="mb-1">
+                    Sistema Web de Gestión de Biblioteca Universitaria
+                </p>
+
+                <p class="small text-secondary mb-0">
+                    Comprometidos con el ODS 09: Industria, Innovación e Infraestructura
+                </p>
+
+            </div>
+
+        </footer>
+
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+        </script>
+
+    </body>
+
+</html>
