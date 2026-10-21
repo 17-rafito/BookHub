@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class LibroDAO {
 
     private static List<Libro> libros = new ArrayList<>();
     private static int contadorId = 1;
+    private static boolean columnaVerificada = false;
 
     static {
         libros.add(new Libro(
@@ -25,7 +27,8 @@ public class LibroDAO {
                 1,
                 "Gabriel García Márquez",
                 1,
-                "Novela"
+                "Novela",
+                "img/portadas/libro1.svg"
         ));
 
         libros.add(new Libro(
@@ -38,7 +41,8 @@ public class LibroDAO {
                 2,
                 "Miguel de Cervantes",
                 1,
-                "Novela"
+                "Novela",
+                "img/portadas/libro2.svg"
         ));
 
         libros.add(new Libro(
@@ -51,7 +55,8 @@ public class LibroDAO {
                 3,
                 "Antoine de Saint-Exupéry",
                 1,
-                "Novela"
+                "Novela",
+                "img/portadas/libro3.svg"
         ));
 
         libros.add(new Libro(
@@ -64,7 +69,8 @@ public class LibroDAO {
                 4,
                 "Robert C. Martin",
                 2,
-                "Programación"
+                "Programación",
+                "img/portadas/libro4.svg"
         ));
 
         libros.add(new Libro(
@@ -77,7 +83,8 @@ public class LibroDAO {
                 5,
                 "Klaus Schwab",
                 4,
-                "ODS 09 - Innovación e Infraestructura"
+                "ODS 09 - Innovación e Infraestructura",
+                "img/portadas/libro5.svg"
         ));
 
         libros.add(new Libro(
@@ -90,8 +97,21 @@ public class LibroDAO {
                 6,
                 "ONU Hábitat / CEPAL",
                 4,
-                "ODS 09 - Innovación e Infraestructura"
+                "ODS 09 - Innovación e Infraestructura",
+                "img/portadas/libro6.svg"
         ));
+    }
+
+    private void asegurarColumnaPortada(Connection con) {
+        if (columnaVerificada || con == null) {
+            return;
+        }
+        columnaVerificada = true;
+        try (Statement st = con.createStatement()) {
+            st.executeUpdate("ALTER TABLE libros ADD COLUMN imagen_portada LONGTEXT");
+        } catch (SQLException ignored) {
+            // La columna ya existe
+        }
     }
 
     // ============================
@@ -101,7 +121,8 @@ public class LibroDAO {
     public List<Libro> listar() {
         String sql = "SELECT l.id_libro, l.titulo, l.isbn, l.anio, l.descripcion, l.stock, "
                 + "l.id_autor, COALESCE(a.nombre, 'Autor General') AS nombre_autor, "
-                + "l.id_categoria, COALESCE(c.nombre, 'General') AS nombre_categoria "
+                + "l.id_categoria, COALESCE(c.nombre, 'General') AS nombre_categoria, "
+                + "l.imagen_portada "
                 + "FROM libros l "
                 + "LEFT JOIN autores a ON l.id_autor = a.id_autor "
                 + "LEFT JOIN categorias c ON l.id_categoria = c.id_categoria "
@@ -109,6 +130,7 @@ public class LibroDAO {
 
         try (Connection con = Conexion.conectar()) {
             if (con != null) {
+                asegurarColumnaPortada(con);
                 try (PreparedStatement ps = con.prepareStatement(sql);
                      ResultSet rs = ps.executeQuery()) {
                     List<Libro> listaBD = new ArrayList<>();
@@ -123,7 +145,8 @@ public class LibroDAO {
                                 rs.getInt("id_autor"),
                                 rs.getString("nombre_autor"),
                                 rs.getInt("id_categoria"),
-                                rs.getString("nombre_categoria")
+                                rs.getString("nombre_categoria"),
+                                rs.getString("imagen_portada")
                         ));
                     }
                     if (!listaBD.isEmpty()) {
@@ -145,7 +168,8 @@ public class LibroDAO {
     public Libro obtenerPorId(int id) {
         String sql = "SELECT l.id_libro, l.titulo, l.isbn, l.anio, l.descripcion, l.stock, "
                 + "l.id_autor, COALESCE(a.nombre, 'Autor General') AS nombre_autor, "
-                + "l.id_categoria, COALESCE(c.nombre, 'General') AS nombre_categoria "
+                + "l.id_categoria, COALESCE(c.nombre, 'General') AS nombre_categoria, "
+                + "l.imagen_portada "
                 + "FROM libros l "
                 + "LEFT JOIN autores a ON l.id_autor = a.id_autor "
                 + "LEFT JOIN categorias c ON l.id_categoria = c.id_categoria "
@@ -153,6 +177,7 @@ public class LibroDAO {
 
         try (Connection con = Conexion.conectar()) {
             if (con != null) {
+                asegurarColumnaPortada(con);
                 try (PreparedStatement ps = con.prepareStatement(sql)) {
                     ps.setInt(1, id);
                     try (ResultSet rs = ps.executeQuery()) {
@@ -167,7 +192,8 @@ public class LibroDAO {
                                     rs.getInt("id_autor"),
                                     rs.getString("nombre_autor"),
                                     rs.getInt("id_categoria"),
-                                    rs.getString("nombre_categoria")
+                                    rs.getString("nombre_categoria"),
+                                    rs.getString("imagen_portada")
                             );
                         }
                     }
@@ -227,9 +253,10 @@ public class LibroDAO {
             libro.setNombreCategoria("General");
         }
 
-        String sql = "INSERT INTO libros (titulo, isbn, anio, descripcion, stock, id_autor, id_categoria) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO libros (titulo, isbn, anio, descripcion, stock, id_autor, id_categoria, imagen_portada) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = Conexion.conectar()) {
             if (con != null) {
+                asegurarColumnaPortada(con);
                 try (PreparedStatement ps = con.prepareStatement(sql)) {
                     ps.setString(1, libro.getTitulo());
                     ps.setString(2, libro.getIsbn());
@@ -238,6 +265,7 @@ public class LibroDAO {
                     ps.setInt(5, libro.getStock());
                     ps.setInt(6, libro.getIdAutor() > 0 ? libro.getIdAutor() : 1);
                     ps.setInt(7, libro.getIdCategoria() > 0 ? libro.getIdCategoria() : 1);
+                    ps.setString(8, libro.getImagenPortada());
                     ps.executeUpdate();
                 }
             }
@@ -254,16 +282,20 @@ public class LibroDAO {
     // ============================
 
     public void actualizar(Libro libro) {
-        String sql = "UPDATE libros SET titulo = ?, isbn = ?, anio = ?, descripcion = ?, stock = ? WHERE id_libro = ?";
+        String sql = "UPDATE libros SET titulo = ?, isbn = ?, anio = ?, descripcion = ?, stock = ?, id_autor = ?, id_categoria = ?, imagen_portada = ? WHERE id_libro = ?";
         try (Connection con = Conexion.conectar()) {
             if (con != null) {
+                asegurarColumnaPortada(con);
                 try (PreparedStatement ps = con.prepareStatement(sql)) {
                     ps.setString(1, libro.getTitulo());
                     ps.setString(2, libro.getIsbn());
                     ps.setInt(3, libro.getAnio());
                     ps.setString(4, libro.getDescripcion());
                     ps.setInt(5, libro.getStock());
-                    ps.setInt(6, libro.getIdLibro());
+                    ps.setInt(6, libro.getIdAutor() > 0 ? libro.getIdAutor() : 1);
+                    ps.setInt(7, libro.getIdCategoria() > 0 ? libro.getIdCategoria() : 1);
+                    ps.setString(8, libro.getImagenPortada());
+                    ps.setInt(9, libro.getIdLibro());
                     ps.executeUpdate();
                 }
             }
