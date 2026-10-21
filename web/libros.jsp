@@ -24,32 +24,6 @@
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
               rel="stylesheet">
-
-        <style>
-            .portada-mini {
-                width: 48px;
-                height: 68px;
-                object-fit: cover;
-                border-radius: 4px;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-            }
-            .preview-portada-box {
-                width: 90px;
-                height: 126px;
-                border-radius: 6px;
-                border: 1px dashed #adb5bd;
-                background-color: #f8f9fa;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-            }
-            .preview-portada-box img {
-                max-width: 100%;
-                max-height: 100%;
-                object-fit: contain;
-            }
-        </style>
     </head>
 
     <body class="bg-light">
@@ -65,14 +39,9 @@
                     BOOKHUB
                 </a>
 
-                <div class="d-flex gap-2">
-                    <a href="CatalogoServlet" class="btn btn-outline-info btn-sm">
-                        Ver Catálogo
-                    </a>
-                    <a href="dashboard.jsp" class="btn btn-outline-light btn-sm">
-                        Volver al Dashboard
-                    </a>
-                </div>
+                <a href="dashboard.jsp" class="btn btn-outline-light">
+                    Volver al Dashboard
+                </a>
 
             </div>
 
@@ -92,7 +61,7 @@
                 <h1>Gestión de Libros</h1>
 
                 <p class="text-muted">
-                    Administra el catálogo de libros y sus imágenes de portada en la biblioteca.
+                    Administra el catálogo de libros de la biblioteca.
                 </p>
 
             </div>
@@ -231,7 +200,7 @@
 
                             <!-- AÑO -->
 
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
 
                                 <label class="form-label">
                                     Año
@@ -249,7 +218,7 @@
 
                             <!-- STOCK -->
 
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
 
                                 <label class="form-label">
                                     Stock
@@ -261,45 +230,6 @@
                                        min="0"
                                        value="<%= editando ? libroEditar.getStock() : ""%>"
                                        required>
-
-                            </div>
-
-
-                            <!-- IMAGEN DE PORTADA (URL O ARCHIVO DESDE LA PC) -->
-
-                            <div class="col-md-6 mb-3">
-
-                                <label class="form-label">
-                                    Imagen de Portada (URL o subir desde tu PC)
-                                </label>
-
-                                <div class="d-flex gap-3 align-items-start">
-                                    <div class="flex-grow-1">
-                                        <input type="text"
-                                               name="imagenPortada"
-                                               id="inputImagenPortada"
-                                               class="form-control mb-2"
-                                               placeholder="https://ejemplo.com/portada.jpg o sube un archivo abajo..."
-                                               value="<%= editando ? libroEditar.getImagenPortada() : ""%>"
-                                               oninput="actualizarVistaPrevia(this.value)">
-
-                                        <input type="file"
-                                               id="archivoPortada"
-                                               class="form-control form-control-sm"
-                                               accept="image/*"
-                                               onchange="cargarArchivoPortada(this)">
-                                        <small class="text-muted d-block mt-1">
-                                            Puedes pegar un enlace de imagen o seleccionar una foto desde tu computadora.
-                                        </small>
-                                    </div>
-
-                                    <div class="preview-portada-box flex-shrink-0" title="Vista previa de portada">
-                                        <img id="imgVistaPrevia"
-                                             src="<%= editando ? libroEditar.getImagenPortada() : "img/portadas/default.svg" %>"
-                                             alt="Vista previa"
-                                             onerror="this.onerror=null;this.src='img/portadas/default.svg';">
-                                    </div>
-                                </div>
 
                             </div>
 
@@ -388,8 +318,6 @@
 
                                     <th>ID</th>
 
-                                    <th>Portada</th>
-
                                     <th>Título</th>
 
                                     <th>Autor</th>
@@ -439,15 +367,6 @@
                                     </td>
 
 
-                                    <!-- PORTADA -->
-
-                                    <td>
-                                        <img src="<%= libro.getImagenPortada() %>"
-                                             alt="Portada"
-                                             class="portada-mini"
-                                             onerror="this.onerror=null;this.src='img/portadas/default.svg';">
-                                    </td>
-
 
                                     <!-- TÍTULO -->
 
@@ -488,6 +407,7 @@
                                     </td>
 
 
+
                                     <!-- AÑO -->
 
                                     <td>
@@ -497,11 +417,14 @@
                                     </td>
 
 
+
                                     <!-- STOCK -->
 
                                     <td>
 
+
                                         <% if (libro.getStock() > 0) {%>
+
 
                                         <span class="badge bg-success">
 
@@ -510,7 +433,9 @@
 
                                         </span>
 
+
                                         <% } else { %>
+
 
                                         <span class="badge bg-danger">
 
@@ -518,7 +443,9 @@
 
                                         </span>
 
+
                                         <% }%>
+
 
                                     </td>
 
@@ -558,9 +485,11 @@
 
 
                                 <%
+
                                     }
 
                                 } else {
+
                                 %>
 
 
@@ -568,7 +497,7 @@
 
                                 <tr>
 
-                                    <td colspan="9"
+                                    <td colspan="8"
                                         class="text-center text-muted">
 
                                         No hay libros registrados.
@@ -576,6 +505,7 @@
                                     </td>
 
                                 </tr>
+
 
                                 <%                        }
 
@@ -609,49 +539,6 @@
 
         </footer>
 
-
-        <script>
-            function actualizarVistaPrevia(url) {
-                const img = document.getElementById("imgVistaPrevia");
-                if (url && url.trim() !== "") {
-                    img.src = url.trim();
-                } else {
-                    img.src = "img/portadas/default.svg";
-                }
-            }
-
-            function cargarArchivoPortada(input) {
-                if (!input.files || !input.files[0]) {
-                    return;
-                }
-                const file = input.files[0];
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const imgObj = new Image();
-                    imgObj.onload = function () {
-                        const canvas = document.createElement("canvas");
-                        const maxW = 300;
-                        const maxH = 420;
-                        let w = imgObj.width;
-                        let h = imgObj.height;
-                        if (w > maxW || h > maxH) {
-                            const ratio = Math.min(maxW / w, maxH / h);
-                            w = Math.round(w * ratio);
-                            h = Math.round(h * ratio);
-                        }
-                        canvas.width = w;
-                        canvas.height = h;
-                        const ctx = canvas.getContext("2d");
-                        ctx.drawImage(imgObj, 0, 0, w, h);
-                        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-                        document.getElementById("inputImagenPortada").value = dataUrl;
-                        document.getElementById("imgVistaPrevia").src = dataUrl;
-                    };
-                    imgObj.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        </script>
 
     </body>
 </html>

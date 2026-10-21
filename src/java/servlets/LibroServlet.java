@@ -71,7 +71,6 @@ public class LibroServlet extends HttpServlet {
         int anio = Integer.parseInt(request.getParameter("anio"));
         String descripcion = request.getParameter("descripcion");
         int stock = Integer.parseInt(request.getParameter("stock"));
-        String imagenPortada = request.getParameter("imagenPortada");
 
         String idAutorStr = request.getParameter("idAutor");
         String idCategoriaStr = request.getParameter("idCategoria");
@@ -82,7 +81,6 @@ public class LibroServlet extends HttpServlet {
         libro.setAnio(anio);
         libro.setDescripcion(descripcion);
         libro.setStock(stock);
-        libro.setImagenPortada(imagenPortada);
 
         if (idAutorStr != null && !idAutorStr.isEmpty()) {
             int idAutor = Integer.parseInt(idAutorStr);

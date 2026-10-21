@@ -34,20 +34,6 @@
                 background-color: #fd6925;
                 color: #ffffff;
             }
-            .detalle-portada-box {
-                background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
-                border-radius: 10px;
-                padding: 20px;
-                text-align: center;
-                border: 1px solid rgba(0, 0, 0, 0.08);
-            }
-            .detalle-portada-img {
-                max-height: 320px;
-                width: auto;
-                max-width: 100%;
-                border-radius: 8px;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
-            }
         </style>
 
     </head>
@@ -83,7 +69,7 @@
 
             <div class="row justify-content-center">
 
-                <div class="col-md-9">
+                <div class="col-md-8">
 
                     <% if ("prestado".equals(exito)) { %>
                         <div class="alert alert-success">
@@ -101,149 +87,130 @@
 
                     <div class="card shadow-sm">
 
-                        <div class="card-body p-4 p-md-5">
+                        <div class="card-body p-5">
 
-                            <div class="row g-4 align-items-start">
+                            <span class="badge <%= esOds ? "badge-ods" : "bg-primary" %> mb-3">
+                                <%= libro.getNombreCategoria() %>
+                            </span>
 
-                                <!-- COLUMNA PORTADA -->
-                                <div class="col-md-4">
-                                    <div class="detalle-portada-box">
-                                        <img src="<%= libro.getImagenPortada() %>"
-                                             alt="Portada de <%= libro.getTitulo() %>"
-                                             class="detalle-portada-img"
-                                             onerror="this.onerror=null;this.src='img/portadas/default.svg';">
-                                    </div>
+                            <h1 class="fw-bold mb-4">
+                                <%= libro.getTitulo()%>
+                            </h1>
+
+                            <hr>
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-4 fw-bold">
+                                    Autor
                                 </div>
 
-                                <!-- COLUMNA INFORMACIÓN -->
+                                <div class="col-md-8">
+                                    <%= libro.getNombreAutor() %>
+                                </div>
+
+                            </div>
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-4 fw-bold">
+                                    Categoría
+                                </div>
+
+                                <div class="col-md-8">
+                                    <%= libro.getNombreCategoria() %>
+                                </div>
+
+                            </div>
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-4 fw-bold">
+                                    ISBN
+                                </div>
+
+                                <div class="col-md-8">
+                                    <%= libro.getIsbn()%>
+                                </div>
+
+                            </div>
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-4 fw-bold">
+                                    Año de publicación
+                                </div>
+
+                                <div class="col-md-8">
+                                    <%= libro.getAnio()%>
+                                </div>
+
+                            </div>
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-4 fw-bold">
+                                    Descripción
+                                </div>
+
+                                <div class="col-md-8">
+                                    <%= libro.getDescripcion()%>
+                                </div>
+
+                            </div>
+
+                            <div class="row mb-4">
+
+                                <div class="col-md-4 fw-bold">
+                                    Disponibilidad
+                                </div>
+
                                 <div class="col-md-8">
 
-                                    <span class="badge <%= esOds ? "badge-ods" : "bg-primary" %> mb-3">
-                                        <%= libro.getNombreCategoria() %>
+                                    <% if (libro.getStock() > 0) {%>
+
+                                    <span class="badge bg-success">
+                                        Disponible
                                     </span>
 
-                                    <h2 class="fw-bold mb-3">
-                                        <%= libro.getTitulo()%>
-                                    </h2>
+                                    <span class="ms-2">
+                                        <%= libro.getStock()%> ejemplares
+                                    </span>
 
-                                    <hr>
+                                    <% } else { %>
 
-                                    <div class="row mb-3">
+                                    <span class="badge bg-danger">
+                                        No disponible
+                                    </span>
 
-                                        <div class="col-md-4 fw-bold">
-                                            Autor
-                                        </div>
-
-                                        <div class="col-md-8">
-                                            <%= libro.getNombreAutor() %>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row mb-3">
-
-                                        <div class="col-md-4 fw-bold">
-                                            Categoría
-                                        </div>
-
-                                        <div class="col-md-8">
-                                            <%= libro.getNombreCategoria() %>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row mb-3">
-
-                                        <div class="col-md-4 fw-bold">
-                                            ISBN
-                                        </div>
-
-                                        <div class="col-md-8">
-                                            <%= libro.getIsbn()%>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row mb-3">
-
-                                        <div class="col-md-4 fw-bold">
-                                            Año de publicación
-                                        </div>
-
-                                        <div class="col-md-8">
-                                            <%= libro.getAnio()%>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row mb-3">
-
-                                        <div class="col-md-4 fw-bold">
-                                            Descripción
-                                        </div>
-
-                                        <div class="col-md-8">
-                                            <%= libro.getDescripcion()%>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row mb-4">
-
-                                        <div class="col-md-4 fw-bold">
-                                            Disponibilidad
-                                        </div>
-
-                                        <div class="col-md-8">
-
-                                            <% if (libro.getStock() > 0) {%>
-
-                                            <span class="badge bg-success">
-                                                Disponible
-                                            </span>
-
-                                            <span class="ms-2">
-                                                <%= libro.getStock()%> ejemplares
-                                            </span>
-
-                                            <% } else { %>
-
-                                            <span class="badge bg-danger">
-                                                No disponible
-                                            </span>
-
-                                            <% } %>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    <div class="d-flex gap-2">
-                                        <% if (libro.getStock() > 0) { %>
-
-                                        <a href="SolicitarPrestamoServlet?idLibro=<%= libro.getIdLibro() %>"
-                                           class="btn btn-primary">
-                                            Solicitar préstamo
-                                        </a>
-
-                                        <% } else { %>
-
-                                        <button class="btn btn-secondary"
-                                                disabled>
-                                            Libro no disponible
-                                        </button>
-
-                                        <% } %>
-
-                                        <a href="CatalogoServlet"
-                                           class="btn btn-outline-secondary">
-                                            Volver al catálogo
-                                        </a>
-                                    </div>
+                                    <% } %>
 
                                 </div>
 
+                            </div>
+
+
+                            <div class="d-flex gap-2">
+                                <% if (libro.getStock() > 0) { %>
+
+                                <a href="SolicitarPrestamoServlet?idLibro=<%= libro.getIdLibro() %>"
+                                   class="btn btn-primary">
+                                    Solicitar préstamo
+                                </a>
+
+                                <% } else { %>
+
+                                <button class="btn btn-secondary"
+                                        disabled>
+                                    Libro no disponible
+                                </button>
+
+                                <% } %>
+
+                                <a href="CatalogoServlet"
+                                   class="btn btn-outline-secondary">
+                                    Volver al catálogo
+                                </a>
                             </div>
 
                         </div>

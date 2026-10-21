@@ -12,7 +12,6 @@ public class Libro {
     private int idCategoria;
     private String nombreAutor;
     private String nombreCategoria;
-    private String imagenPortada;
     private Autor autor;
     private Categoria categoria;
 
@@ -32,12 +31,6 @@ public class Libro {
     public Libro(int idLibro, String titulo, String isbn, int anio,
                  String descripcion, int stock, int idAutor, String nombreAutor,
                  int idCategoria, String nombreCategoria) {
-        this(idLibro, titulo, isbn, anio, descripcion, stock, idAutor, nombreAutor, idCategoria, nombreCategoria, null);
-    }
-
-    public Libro(int idLibro, String titulo, String isbn, int anio,
-                 String descripcion, int stock, int idAutor, String nombreAutor,
-                 int idCategoria, String nombreCategoria, String imagenPortada) {
         this.idLibro = idLibro;
         this.titulo = titulo;
         this.isbn = isbn;
@@ -48,7 +41,6 @@ public class Libro {
         this.nombreAutor = nombreAutor;
         this.idCategoria = idCategoria;
         this.nombreCategoria = nombreCategoria;
-        this.imagenPortada = imagenPortada;
     }
 
     public int getIdLibro() {
@@ -133,20 +125,6 @@ public class Libro {
 
     public void setNombreCategoria(String nombreCategoria) {
         this.nombreCategoria = nombreCategoria;
-    }
-
-    public String getImagenPortada() {
-        if (imagenPortada != null && !imagenPortada.trim().isEmpty()) {
-            return imagenPortada.trim();
-        }
-        if (idLibro >= 1 && idLibro <= 6) {
-            return "img/portadas/libro" + idLibro + ".svg";
-        }
-        return "img/portadas/default.svg";
-    }
-
-    public void setImagenPortada(String imagenPortada) {
-        this.imagenPortada = imagenPortada;
     }
 
     public Autor getAutor() {
