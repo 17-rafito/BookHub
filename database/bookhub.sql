@@ -67,25 +67,20 @@ INSERT INTO autores (id_autor, nombre, nacionalidad) VALUES
 (1, 'Gabriel García Márquez', 'Colombiana'),
 (2, 'Miguel de Cervantes', 'Española'),
 (3, 'Antoine de Saint-Exupéry', 'Francesa'),
-(4, 'Robert C. Martin', 'Estadounidense'),
-(5, 'Klaus Schwab', 'Alemana'),
-(6, 'ONU Hábitat / CEPAL', 'Internacional')
+(4, 'Robert C. Martin', 'Estadounidense')
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
 
 INSERT INTO categorias (id_categoria, nombre, descripcion) VALUES
 (1, 'Novela', 'Obras narrativas de ficción y literatura clásica.'),
 (2, 'Programación', 'Libros relacionados con ingeniería y desarrollo de software.'),
-(3, 'Ciencia', 'Libros relacionados con ciencias exactas, física e investigación.'),
-(4, 'ODS 09 - Innovación e Infraestructura', 'Obras sobre industria sostenible, innovación tecnológica e infraestructura resiliente (Agenda 2030).')
+(3, 'Ciencia', 'Libros relacionados con ciencias exactas, física e investigación.')
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
 
 INSERT INTO libros (id_libro, titulo, isbn, anio, descripcion, stock, id_autor, id_categoria, imagen_portada) VALUES
 (1, 'Cien años de soledad', '9780307474728', 1967, 'Novela cumbre del realismo mágico escrita por el colombiano Gabriel García Márquez.', 5, 1, 1, 'img/portadas/libro1.svg'),
-(2, 'Don Quijote de la Mancha', '9788420412146', 1605, 'Obra clásica universal de la literatura española escrita por Miguel de Cervantes.', 3, 2, 1, 'img/portadas/libro2.svg'),
+(2, 'Don Quijote de la Mancha', '9788420412146', 1605, 'Obra clásica universal de la literatura española escrita por Miguel de Cervantes.', 2, 2, 1, 'img/portadas/libro2.svg'),
 (3, 'El Principito', '9780156012195', 1943, 'Obra literaria y filosófica de Antoine de Saint-Exupéry sobre la amistad y el sentido de la vida.', 7, 3, 1, 'img/portadas/libro3.svg'),
-(4, 'Clean Code: Manual de desarrollo ágil de software', '9780132350884', 2008, 'Principios, patrones y buenas prácticas para escribir código limpio y mantenible.', 4, 4, 2, 'img/portadas/libro4.svg'),
-(5, 'La Cuarta Revolución Industrial y la Innovación Sostenible (ODS 09)', '9788499926995', 2020, 'Análisis sobre cómo la transformación digital, la industria 4.0 y la innovación impulsan el Objetivo de Desarrollo Sostenible 9.', 6, 5, 4, 'img/portadas/libro5.svg'),
-(6, 'Infraestructura Resiliente e Industrialización Inclusiva - Agenda 2030 (ODS 09)', '9789211219876', 2023, 'Guía académica sobre conectividades digitales universitarias, investigación científica e infraestructura sostenible en América Latina.', 5, 6, 4, 'img/portadas/libro6.svg')
+(4, 'Clean Code: Manual de desarrollo ágil de software', '9780132350884', 2008, 'Principios, patrones y buenas prácticas para escribir código limpio y mantenible.', 4, 4, 2, 'img/portadas/libro4.svg')
 ON DUPLICATE KEY UPDATE titulo = VALUES(titulo), imagen_portada = COALESCE(imagen_portada, VALUES(imagen_portada));
 
 -- 1 Usuario Administrador y 2 Usuarios Lectores ya creados

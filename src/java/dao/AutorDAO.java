@@ -38,18 +38,6 @@ public class AutorDAO {
                 "Robert C. Martin",
                 "Estadounidense"
         ));
-
-        autores.add(new Autor(
-                contadorId++,
-                "Klaus Schwab",
-                "Alemana"
-        ));
-
-        autores.add(new Autor(
-                contadorId++,
-                "ONU Hábitat / CEPAL",
-                "Internacional"
-        ));
     }
 
     // ============================

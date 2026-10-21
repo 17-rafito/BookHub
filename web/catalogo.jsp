@@ -154,6 +154,11 @@
                 Inicio
             </a>
 
+            <a href="InnovacionServlet"
+               class="btn btn-outline-light btn-sm">
+                ODS 09
+            </a>
+
             <% if (usuarioSesion != null) { %>
 
                 <% if ("ADMIN".equals(usuarioSesion.getRol())) { %>
@@ -209,7 +214,7 @@
         </h1>
 
         <p class="lead mb-0">
-            Encuentra los libros disponibles en BOOKHUB y filtra por autor, categoría u ODS 09
+            Encuentra los libros disponibles en BOOKHUB y filtra por autor o categoría
         </p>
 
     </div>
@@ -220,35 +225,6 @@
 <!-- CONTENIDO -->
 
 <div class="container py-5">
-
-
-    <!-- BANNER DESTACADO ODS 09 -->
-
-    <div class="card ods-banner shadow-sm mb-4">
-        <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <span class="badge badge-ods mb-1">ODS 09 - AGENDA 2030</span>
-                <h5 class="fw-bold mb-1">
-                    🏗️ Colección Especial: Industria, Innovación e Infraestructura
-                </h5>
-                <p class="text-muted small mb-0">
-                    Explora nuestra bibliografía sobre transformación digital, infraestructura resiliente e innovación tecnológica sostenible.
-                </p>
-            </div>
-            <div class="d-flex gap-2">
-                <a href="CatalogoServlet?categoria=ODS+09+-+Innovaci%C3%B3n+e+Infraestructura"
-                   class="btn btn-sm btn-primary">
-                    Filtrar libros ODS 09
-                </a>
-                <% if (!categoriaSeleccionada.isEmpty() || !busqueda.isEmpty()) { %>
-                    <a href="CatalogoServlet"
-                       class="btn btn-sm btn-outline-secondary">
-                        Ver todos
-                    </a>
-                <% } %>
-            </div>
-        </div>
-    </div>
 
 
     <!-- BUSCADOR Y FILTROS -->
@@ -319,9 +295,6 @@
                     </button>
                     <button type="button" class="btn btn-sm btn-outline-primary chip-filtro" onclick="filtrarPorChip('programación', this)">
                         💻 Programación
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-primary chip-filtro" onclick="filtrarPorChip('ods 09', this)">
-                        🏗️ ODS 09
                     </button>
                 </div>
 
@@ -522,11 +495,8 @@
 
 <footer class="bg-dark text-white text-center py-4 mt-5">
 
-    <p class="mb-1">
+    <p class="mb-0">
         © 2026 BOOKHUB - Sistema de Gestión de Biblioteca Universitaria
-    </p>
-    <p class="small text-secondary mb-0">
-        ODS 09: Industria, Innovación e Infraestructura
     </p>
 
 </footer>

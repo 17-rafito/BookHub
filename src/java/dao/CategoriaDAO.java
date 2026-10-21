@@ -32,12 +32,6 @@ public class CategoriaDAO {
                 "Ciencia",
                 "Libros relacionados con ciencias exactas, física e investigación."
         ));
-
-        categorias.add(new Categoria(
-                contadorId++,
-                "ODS 09 - Innovación e Infraestructura",
-                "Obras sobre industria sostenible, innovación tecnológica e infraestructura resiliente (Agenda 2030)."
-        ));
     }
 
     // ============================
@@ -45,7 +39,7 @@ public class CategoriaDAO {
     // ============================
 
     public List<Categoria> listar() {
-        String sql = "SELECT id_categoria, nombre, descripcion FROM categorias ORDER BY id_categoria ASC";
+        String sql = "SELECT id_categoria, nombre, descripcion FROM categorias WHERE nombre NOT LIKE 'ODS 09%' ORDER BY id_categoria ASC";
         try (Connection con = Conexion.conectar()) {
             if (con != null) {
                 try (PreparedStatement ps = con.prepareStatement(sql);

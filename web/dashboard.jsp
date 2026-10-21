@@ -45,9 +45,14 @@
 
         </a>
 
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center gap-2">
 
-            <span class="text-white me-3">
+            <a href="InnovacionServlet"
+               class="btn btn-outline-light btn-sm">
+                ODS 09
+            </a>
+
+            <span class="text-white mx-2">
 
                 Hola, <%= usuario.getNombre() %>
 

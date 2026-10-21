@@ -37,7 +37,7 @@ public class LibroDAO {
                 "9788420412146",
                 1605,
                 "Obra clásica universal de la literatura española escrita por Miguel de Cervantes.",
-                3,
+                2,
                 2,
                 "Miguel de Cervantes",
                 1,
@@ -72,34 +72,6 @@ public class LibroDAO {
                 "Programación",
                 "img/portadas/libro4.svg"
         ));
-
-        libros.add(new Libro(
-                contadorId++,
-                "La Cuarta Revolución Industrial y la Innovación Sostenible (ODS 09)",
-                "9788499926995",
-                2020,
-                "Análisis sobre cómo la transformación digital, la industria 4.0 y la innovación impulsan el Objetivo de Desarrollo Sostenible 9.",
-                6,
-                5,
-                "Klaus Schwab",
-                4,
-                "ODS 09 - Innovación e Infraestructura",
-                "img/portadas/libro5.svg"
-        ));
-
-        libros.add(new Libro(
-                contadorId++,
-                "Infraestructura Resiliente e Industrialización Inclusiva - Agenda 2030 (ODS 09)",
-                "9789211219876",
-                2023,
-                "Guía académica sobre conectividades digitales universitarias, investigación científica e infraestructura sostenible en América Latina.",
-                5,
-                6,
-                "ONU Hábitat / CEPAL",
-                4,
-                "ODS 09 - Innovación e Infraestructura",
-                "img/portadas/libro6.svg"
-        ));
     }
 
     private void asegurarColumnaPortada(Connection con) {
@@ -111,6 +83,12 @@ public class LibroDAO {
             st.executeUpdate("ALTER TABLE libros ADD COLUMN imagen_portada LONGTEXT");
         } catch (SQLException ignored) {
             // La columna ya existe
+        }
+        try (Statement st = con.createStatement()) {
+            st.executeUpdate("DELETE FROM libros WHERE titulo LIKE '%(ODS 09)%'");
+            st.executeUpdate("DELETE FROM categorias WHERE nombre LIKE 'ODS 09%'");
+            st.executeUpdate("DELETE FROM autores WHERE nombre IN ('Klaus Schwab', 'ONU Hábitat / CEPAL')");
+        } catch (SQLException ignored) {
         }
     }
 

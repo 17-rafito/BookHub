@@ -4,12 +4,13 @@ Aplicación web desarrollada en **Java (Jakarta EE / Servlets / JSP / MVC / DAO 
 
 ---
 
-## 🌱 Compromiso con el ODS 09: Industria, Innovación e Infraestructura
+## 📊 Panel de Innovación Bibliotecaria (ODS 09)
 
-**BOOKHUB** está alineado con el **Objetivo de Desarrollo Sostenible 9 (ODS 09)** de la Agenda 2030 de las Naciones Unidas:
-- **Infraestructura Digital Resiliente (Meta 9.1):** Digitalización de la gestión bibliotecaria universitaria.
-- **Investigación Científica e Innovación Tecnológica (Meta 9.5):** Colección bibliográfica especializada en la categoría **"ODS 09 - Innovación e Infraestructura"** disponible directamente en el catálogo.
-- **Acceso Universal a las TIC (Meta 9.c):** Consulta de stock en tiempo real, registro de lectores y solicitud de préstamos en línea.
+**BOOKHUB** incorpora el apartado **Panel de Innovación Bibliotecaria** (accesible desde el botón **ODS 09** en la barra de navegación), diseñado para mejorar la disponibilidad de los recursos bibliográficos mediante el uso de datos y apoyar la toma de decisiones sobre la biblioteca a través de **4 indicadores en tiempo real** conectados a `LibroDAO` y `PrestamoDAO`:
+- **Libros registrados:** Total de títulos registrados en el catálogo.
+- **Stock bajo:** Libros con **1 a 2 ejemplares** disponibles (alerta preventiva de reposición).
+- **Préstamos activos:** Total de préstamos vigentes (`PRESTADO`) en la biblioteca.
+- **Libros agotados:** Libros con **0 ejemplares** disponibles que requieren acción inmediata.
 
 ---
 
