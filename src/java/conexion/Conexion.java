@@ -13,7 +13,7 @@ public class Conexion {
             "jdbc:mysql://localhost:3306/bookhub?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8";
 
     private static final String USER = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "123456789";
 
     public static Connection conectar() {
         try {
@@ -23,14 +23,17 @@ public class Conexion {
             return null;
         }
 
-        try {
-            return DriverManager.getConnection(URL_3307, USER, PASSWORD);
-        } catch (SQLException e1) {
-            try {
-                return DriverManager.getConnection(URL_3306, USER, PASSWORD);
-            } catch (SQLException e2) {
-                return null;
+        String[] urls = {URL_3306, URL_3307};
+        String[] passwords = {PASSWORD, ""};
+
+        for (String url : urls) {
+            for (String pass : passwords) {
+                try {
+                    return DriverManager.getConnection(url, USER, pass);
+                } catch (SQLException ignored) {
+                }
             }
         }
+        return null;
     }
 }
